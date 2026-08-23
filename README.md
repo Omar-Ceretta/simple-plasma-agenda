@@ -84,7 +84,7 @@ Testing is being expanded across several Plasma distributions and clean virtual 
 
 ## AI-assisted development
 
-This project has been developed with substantial assistance from **OpenAI ChatGPT** for source analysis, QML implementation/refactoring, debugging, documentation and test planning. Functional goals, design choices, manual tests and acceptance/rejection of proposed changes are directed by **Omar Ceretta**.
+This project has been developed with substantial assistance from **OpenAI ChatGPT** for source analysis, QML implementation/refactoring, debugging, documentation and test planning. Functional goals, design choices, manual tests and acceptance/rejection of proposed changes are directed by the **Author**.
 
 The project does not present AI-generated output as independently verified code: changes are intended to be reviewed and tested on real Plasma systems before release. See [AI_ASSISTED_DEVELOPMENT.md](AI_ASSISTED_DEVELOPMENT.md).
 
