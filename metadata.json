@@ -1,0 +1,22 @@
+{
+  "KPackageStructure": "Plasma/Applet",
+  "KPlugin": {
+    "Authors": [
+      {
+        "Name": "Omar Ceretta"
+      }
+    ],
+    "Category": "Date and Time",
+    "Description": "A compact Plasma 6 agenda for upcoming KDE PIM/Akonadi events.",
+    "Description[it]": "Un'agenda compatta per Plasma 6 che mostra i prossimi eventi KDE PIM/Akonadi.",
+    "EnabledByDefault": true,
+    "Icon": "view-calendar-agenda",
+    "Id": "com.simple.plasma.agenda",
+    "License": "GPL-3.0",
+    "Name": "Simple Plasma Agenda",
+    "Name[it]": "Simple Plasma Agenda",
+    "Version": "0.2.3",
+    "Website": "https://github.com/Omar-Ceretta/simple-plasma-agenda"
+  },
+  "X-Plasma-API-Minimum-Version": "6.0"
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <kcfgfile name=""/>
+
+    <group name="General">
+        <!-- 0 = translucent, 1 = solid -->
+        <entry name="styleMode" type="Int"><default>1</default></entry>
+        <!-- 0 = dark, 1 = light, 2 = follow Plasma -->
+        <entry name="appearance" type="Int"><default>2</default></entry>
+        <entry name="cornerRadius" type="Int"><default>14</default></entry>
+        <entry name="firstDayOfWeek" type="Int"><default>1</default></entry>
+        <entry name="eventLookaheadDays" type="Int"><default>2</default></entry>
+        <entry name="enabledCalendarPlugins" type="StringList"><default>pimevents</default></entry>
+        <entry name="autoSyncGoogle" type="Bool"><default>true</default></entry>
+    </group>
+</kcfg>
