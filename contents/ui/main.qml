@@ -564,11 +564,16 @@ PlasmoidItem {
         postRemoteSyncRefresh.restart();
     }
 
+    // Give the desktop session and Akonadi time to finish starting before the
+    // first automatic Google sync. Triggering it immediately during Plasma
+    // startup can race Akonadi resource activation on some distributions.
     Timer {
         id: initialRemoteSyncTimer
-        interval: 1500
+        interval: 20 * 1000
         repeat: false
-        onTriggered: root.requestRemoteSync()
+        onTriggered: {
+            if (plasmoid.configuration.autoSyncGoogle) root.requestRemoteSync();
+        }
     }
 
     Timer {
