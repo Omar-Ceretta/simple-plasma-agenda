@@ -1,35 +1,113 @@
-# Testing matrix
+# Simple Plasma Agenda — Testing
 
-This file records **actual testing separately from planned testing**. A platform should be marked as passed only after the listed checks have been performed on that environment.
+This document records **tests that were actually performed**. Planned environments and expected compatibility are kept separate so that repository documentation does not overstate support.
 
-Legend: ✅ passed · ⚠️ partial/issues · ❌ failed · ⏳ planned/not yet tested
+Current local development version: **0.2.19**.
 
-| Environment | Type | Plasma version | Agenda display | Google manual sync | Google 5-min auto sync | Status / notes |
-|---|---|---:|---|---|---|---|
-| Fedora KDE 44 | Main development system | _record exact version_ | ✅ | ✅ | ✅ | Existing configured system; not a fresh install |
-| Fedora KDE 44 | Fresh VM | _TBD_ | ⏳ | ⏳ | ⏳ | Planned clean-install test |
-| Kubuntu | Fresh VM | _TBD_ | ⏳ | ⏳ | ⏳ | Planned |
-| Arch Linux + KDE Plasma | Fresh VM | _TBD_ | ⏳ | ⏳ | ⏳ | Planned |
-| TUXEDO OS | Fresh VM | _TBD_ | ⏳ | ⏳ | ⏳ | Planned |
-| openSUSE Tumbleweed KDE | Fresh VM | _TBD_ | ⏳ | ⏳ | ⏳ | Planned |
-| KDE neon | Fresh VM | _TBD_ | ⏳ | ⏳ | ⏳ | Optional additional Plasma-focused test |
+## Tested environments
 
-## Minimum checklist for each environment
+### Fedora KDE 44 / Plasma 6 — PASS
 
-- widget appears in *Add Widgets*;
-- widget can be added and removed without Plasma errors;
-- events already present in Akonadi are shown;
-- Today / Tomorrow / localized dates are correct;
-- week separators appear correctly;
-- 3 / 5 / 7 / 14 day ranges work;
-- solid and translucent modes render correctly;
-- system/light/dark color modes render correctly;
-- manual refresh does not freeze or crash Plasma;
-- if Google/Akonadi is configured, manual forced synchronization works;
-- if Google/Akonadi is configured, five-minute automatic synchronization works;
-- Plasma restart preserves the widget and its settings;
-- logs are checked for new QML errors attributable to Simple Plasma Agenda.
+Primary development environment.
 
-## Notes on non-Google sources
+Verified during development:
 
-The agenda itself is designed to display any events exposed by KDE PIM/Akonadi. Forced remote synchronization is currently implemented and tested only for Akonadi Google resources. CalDAV/Nextcloud, iCalendar, EWS and other resources should be recorded here only after practical testing.
+- plasmoid installation and loading;
+- KDE PIM / Akonadi event display through Plasma `pimevents`;
+- Google Calendar resource through Akonadi;
+- Italian localization, including `OGGI`, `DOMANI` and localized dates;
+- week separators;
+- solid and translucent backgrounds;
+- follow-system, light and dark color modes;
+- compact / normal / airy density presets;
+- small / normal / large event text sizes;
+- accent-colored day headers;
+- past-event dimming after the actual event end time;
+- hover state;
+- keyboard focus and Enter/Space activation;
+- manual Google synchronization;
+- automatic Google synchronization every 5 minutes;
+- event click opening the corresponding day in KOrganizer and bringing KOrganizer forward;
+- simultaneous update of Simple Plasma Agenda and Plasma's Digital Clock when Akonadi calendar data changes.
+
+The Fedora development system also provided `akonadi_control.service` as a systemd user unit. This is **distribution-specific** and must not be assumed elsewhere.
+
+### Kubuntu 26.04 LTS / Plasma 6.6.4 — PASS on 0.2.19
+
+Test VM details recorded during the test cycle:
+
+- base: Ubuntu 26.04 LTS (Resolute Raccoon), Kubuntu desktop;
+- Plasma: 6.6.4;
+- KOrganizer: 6.6.3 (25.12.3);
+- KDE PIM / Akonadi packages observed at 25.12.3;
+- `busctl`: `/usr/bin/busctl`;
+- Plasma PIM plugin: `/usr/lib/x86_64-linux-gnu/qt6/plugins/plasmacalendarplugins/pimevents.so`;
+- Google Akonadi resource tested: `akonadi_google_resource_0`.
+
+Verified:
+
+- Akonadi calendar events visible in KOrganizer;
+- the same events visible in Plasma's Digital Clock;
+- the same events visible in Simple Plasma Agenda;
+- Italian UI/localization;
+- manual Google refresh through `busctl`;
+- automatic Google refresh enabled;
+- event click opens the correct day in KOrganizer and brings the application forward;
+- clean reboot with Akonadi returning `Control: running` / `Server: running`;
+- logout/login with Simple Plasma Agenda installed and automatic Google sync enabled;
+- events remain available after that logout/login on 0.2.19.
+
+#### Kubuntu startup-race finding — resolved in 0.2.19
+
+During testing of 0.2.18, the plasmoid's first forced Google sync ran only **1.5 seconds** after the plasmoid loaded. On Kubuntu this could race Akonadi startup after logout/login. The observed failure state was:
+
+```text
+Akonadi Control: stopped
+Akonadi Server: running
+```
+
+The journal also showed Akonadi resources repeatedly failing to register D-Bus service names that were already present, followed by crashes/restart exhaustion for resources such as Personal Contacts and Local Folders. Plasma's Digital Clock and Simple Plasma Agenda both lost calendar events because the shared Akonadi/PIM backend was unhealthy.
+
+A/B tests isolated the trigger:
+
+- Simple Plasma Agenda removed: logout/login succeeded;
+- Simple Plasma Agenda present but automatic Google sync disabled: logout/login succeeded;
+- automatic Google sync re-enabled with the first forced sync delayed to **20 seconds**: logout/login succeeded.
+
+Version **0.2.19** therefore delays only the **first** automatic Google sync to 20 seconds after plasmoid startup. Manual refresh remains immediate, and subsequent automatic refreshes remain every 5 minutes. No Akonadi restart workaround is required by the widget.
+
+This is recorded as a **resolved development issue**, not as a current Kubuntu limitation.
+
+#### KWallet note from the VM
+
+The Kubuntu VM used SDDM automatic login. A password-protected KWallet therefore requested its password after reboot because the graphical login did not supply a user password that PAM could use to unlock the wallet automatically. This was treated as desktop/session configuration, not a Simple Plasma Agenda defect.
+
+The tested Kubuntu installation did not expose `akonadi_control.service` as a systemd user unit. Akonadi itself was managed and inspected with `akonadictl`.
+
+## Known project limitations relevant to testing
+
+- Calendar source selection is intentionally **not** implemented inside the plasmoid. Saving PIM calendar selections through Plasma's PIM model was found to crash `plasmashell`; source administration remains in Akonadi/KOrganizer.
+- Event activation currently opens **the event's day** in KOrganizer, not the individual incidence editor, because the Plasma calendar QML event wrapper does not expose the original Akonadi incidence UID.
+- Forced remote synchronization is intentionally limited to `akonadi_google_resource_*`. Do not generalize it to arbitrary Akonadi resources, which may represent mail, contacts or other data.
+
+## Planned VM tests
+
+These environments are **not yet recorded as passed**:
+
+- Arch Linux + KDE Plasma — next planned test;
+- openSUSE Tumbleweed KDE;
+- TUXEDO OS (record the exact Debian/Ubuntu base used);
+- KDE neon;
+- an additional fresh Fedora KDE installation if useful before public release.
+
+For each new VM, record at minimum:
+
+```bash
+cat /etc/os-release
+plasmashell --version
+akonadictl status
+command -v busctl
+find /usr -type f -path '*/plasmacalendarplugins/pimevents.so' -print 2>/dev/null
+```
+
+Then verify calendar data first in KOrganizer and Plasma's Digital Clock before diagnosing the plasmoid itself.

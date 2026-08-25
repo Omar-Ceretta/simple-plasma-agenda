@@ -1,33 +1,30 @@
 # Changelog
 
-All notable changes to Simple Plasma Agenda are recorded here.
+Simple Plasma Agenda is still under local pre-release development. These entries document the recent development versions that materially affect cross-distribution testing.
 
-## 0.2.3 - repository bootstrap / consolidation
+## 0.2.19 — 2026-08-25
 
-- Project metadata now identifies **Omar Ceretta** as author and maintainer.
-- Project website moved to the dedicated Simple Plasma Agenda repository.
-- Added explicit upstream attribution and provenance documentation.
-- Added AI-assisted development disclosure.
-- Clarified that event **display** is KDE PIM/Akonadi-wide while forced remote synchronization is currently Google-specific.
-- Added testing matrix and repository documentation.
-- Kept Monday as the default first day of the week.
+### Fixed
 
-## 0.2.2
+- Delayed the **first automatic Google/Akonadi forced synchronization** from 1.5 seconds to 20 seconds after plasmoid startup.
+- This prevents a startup race reproduced on Kubuntu 26.04 where an early forced sync could leave Akonadi in `Control: stopped / Server: running` after logout/login.
+- Manual refresh remains immediate and subsequent automatic refreshes remain every 5 minutes.
 
-- Added manual forced synchronization of Akonadi Google resources.
-- Added optional synchronization every five minutes.
-- Refresh also updates other Plasma consumers because Akonadi data are shared.
-- Cleaned configuration warnings observed during testing.
+### Tested
 
-## 0.2.1
+- Kubuntu 26.04 LTS / Plasma 6.6.4 passed logout/login with automatic Google synchronization enabled, with events visible in both Plasma's Digital Clock and Simple Plasma Agenda.
 
-- Removed the upstream liquid-glass shader and realtime-refraction configuration.
-- Added Plasma-native solid and translucent backgrounds.
-- Added locale-aware day grouping and week separators.
-- Added Italian localization.
-- Removed bundled SF Pro fonts and switched to the system font.
+## 0.2.18 — 2026-08-25
 
-## 0.1.3
+### Fixed
 
-- Established a stable agenda-only baseline while keeping the working upstream Plasma Calendar / Akonadi event backend.
-- Removed calendar-selection controls from the widget configuration.
+- Improved event click portability on Kubuntu by explicitly launching KOrganizer between the `showDate` D-Bus request and the KWin window activation step.
+- Kept Fedora behavior compatible with the same sequence through KOrganizer's single-instance behavior.
+
+## 0.2.17 — 2026-08-25
+
+### Changed
+
+- Replaced Qt-specific `qdbus` command dependencies with `busctl --user` for Google synchronization and KOrganizer/KWin D-Bus actions.
+- Added event hover feedback.
+- Added keyboard focus and Enter/Space event activation with accessibility metadata.
