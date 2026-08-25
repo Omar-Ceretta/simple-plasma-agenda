@@ -6,13 +6,13 @@ It is intentionally an agenda, not a full calendar: the monthly calendar view fr
 
 > **Development status**
 >
-> Current local development version: **0.2.15**.  
+> Current local development version: **0.2.16**.  
 > The widget has been tested so far on **Fedora KDE 44 / Plasma 6**. Package-name notes for other distributions are provided below as installation guidance only; they must not yet be read as a claim of tested support.
 
 ## Main features
 
 - Upcoming KDE PIM / Akonadi events directly on the Plasma desktop.
-- Look-ahead periods: **1, 3, 5, 7, 14, 21 or 28 days**.
+- Look-ahead periods: **1, 3, 5 or 7 days; 2 weeks (14 days); 3 weeks (21 days); 4 weeks (28 days)**.
 - Day sections for **Today**, **Tomorrow** and subsequent localized dates.
 - Week separators.
 - Solid or translucent background.
@@ -31,22 +31,50 @@ Simple Plasma Agenda does **not** connect directly to Google Calendar, Nextcloud
 The data path is:
 
 ```text
-Remote/local calendar
-        ↓
-Akonadi calendar resource
-        ↓
-KDE PIM / pimevents Plasma plugin
-        ↓
-Simple Plasma Agenda
+Google / CalDAV / Nextcloud / iCalendar / local calendar
+                         ↓
+                Akonadi resource
+                         ↓
+                  Akonadi server
+                         ↓
+            KDE PIM `pimevents` plugin
+                         ↓
+              Simple Plasma Agenda
 ```
 
-This is important: if the event is not available in Akonadi, the widget cannot display it.
+KDE describes **KDE PIM** as the family of libraries and applications for personal information such as mail, contacts and calendars, and **Akonadi** as the storage/service framework at the centre of that stack. Akonadi gives applications one common way to access PIM data regardless of whether the original calendar comes from Google, a DAV server, an `.ics` file or another supported resource.
 
-KDE documents Akonadi as the shared PIM storage/service layer used by KDE applications. Akonadi normally starts automatically when an Akonadi-enabled application requests it; `akonadictl` can also be used to start, stop, restart and inspect it manually:
+This distinction matters: if an event is not available through Akonadi and the Plasma `pimevents` plugin, Simple Plasma Agenda cannot display it.
 
-- https://userbase.kde.org/Akonadi
+## What is actually required?
 
-The `pimevents` Plasma calendar plugin is supplied by **kdepim-addons** on the distributions investigated so far.
+For the **core agenda display**, you need:
+
+1. **KDE Plasma 6**;
+2. **Akonadi** running for the current user;
+3. the Akonadi calendar resource(s) needed for your provider — Google, DAV/Nextcloud, iCalendar, local calendar, etc.;
+4. the Plasma **`pimevents`** calendar plugin, provided by `kdepim-addons` on Fedora;
+5. at least one calendar resource configured and synchronized.
+
+The following components are useful but have more specific roles:
+
+- **KOrganizer** is **not required merely to display events**. It is a full calendar application and is the easiest tested GUI for adding/checking Akonadi calendar resources. Simple Plasma Agenda also currently uses KOrganizer for the **click an event → open that day** feature. If KOrganizer is absent, the agenda can still display events, but that click action cannot open the calendar application.
+- **`qdbus-qt6`** is **not required for normal event display**. The current Fedora implementation uses it only for the widget's manual/5-minute **forced Google synchronization**. Normal Akonadi synchronization continues to be handled by the calendar resource itself.
+- **systemd** is not a calendar backend. On Fedora it manages the per-user Akonadi control service, and its `busctl` utility is currently used by the click-to-KOrganizer integration. There is normally no reason to enable Akonadi as a permanent system-wide root service.
+
+## Multiple calendars and providers
+
+Simple Plasma Agenda does not care whether an event originally came from Google, CalDAV/Nextcloud, an iCalendar file or another Akonadi-supported calendar source. The `pimevents` plugin works with Akonadi calendar collections, so **multiple calendar resources can coexist and their events can appear together in the agenda**.
+
+For example, one Akonadi setup may contain at the same time:
+
+- two Google calendars;
+- a Nextcloud/CalDAV calendar;
+- a local or imported iCalendar calendar.
+
+Simple Plasma Agenda does **not** implement its own provider filter and deliberately does not offer calendar-selection checkboxes. Calendar/resource administration remains outside the widget.
+
+Akonadi normally starts automatically when an Akonadi-aware application or component requests it; `akonadictl` can also be used to start, stop, restart and inspect it manually.
 
 ---
 
@@ -54,21 +82,30 @@ The `pimevents` Plasma calendar plugin is supplied by **kdepim-addons** on the d
 
 This is the setup currently tested during development.
 
-## 1. Install the required KDE PIM components
+## 1. Install the KDE PIM/Akonadi components
+
+For the **core agenda display** on the tested Fedora KDE 44 setup:
 
 ```bash
-sudo dnf install akonadi-server kdepim-runtime kdepim-addons korganizer qt6-qttools
+sudo dnf install akonadi-server kdepim-runtime kdepim-addons
 ```
 
-Why these packages are relevant:
+These provide the pieces that matter to the widget:
 
-- `akonadi-server` — the Akonadi service itself and `akonadictl`;
-- `kdepim-runtime` — Akonadi resources, including the Google resource on Fedora;
-- `kdepim-addons` — contains the Plasma `pimevents` calendar plugin used by this widget;
-- `korganizer` — convenient calendar configuration/verification tool and the application opened when an event is clicked;
-- `qt6-qttools` — provides `qdbus-qt6`, currently used by the widget's forced Google synchronization feature on Fedora.
+- `akonadi-server` — the Akonadi service and `akonadictl`;
+- `kdepim-runtime` — Akonadi resources, including Google and DAV resources on Fedora;
+- `kdepim-addons` — contains the Plasma `pimevents` plugin used by Simple Plasma Agenda.
 
-The core agenda display does not require a Google account. Any calendar source correctly exposed through Akonadi may be displayed.
+For the complete currently tested experience, also install:
+
+```bash
+sudo dnf install korganizer qt6-qttools
+```
+
+- `korganizer` — recommended GUI for configuring/verifying calendars and required by the current **click event → open its day** action;
+- `qt6-qttools` — provides `qdbus-qt6`, used only by the widget's Fedora-tested forced Google synchronization feature.
+
+The core agenda display does **not** require a Google account, KOrganizer or `qdbus-qt6`; it requires calendar events to be available through Akonadi + `pimevents`.
 
 ## 2. Check that Akonadi can run
 
@@ -107,7 +144,7 @@ Do not run Akonadi as root.
 
 ## 3. Add at least one calendar to Akonadi
 
-The simplest tested route is KOrganizer.
+The simplest **tested** route is KOrganizer. Other Akonadi-aware calendar applications, such as Merkuro Calendar, can also manage Akonadi-backed calendars; Simple Plasma Agenda only needs the resulting calendar data to be present in Akonadi.
 
 Open **KOrganizer** and go to:
 
@@ -132,9 +169,9 @@ Complete any account authentication requested by the selected resource.
 
 ## 4. Verify Akonadi before installing the widget
 
-Before troubleshooting Simple Plasma Agenda, make sure your events are visible in **KOrganizer**.
+Before troubleshooting Simple Plasma Agenda, verify the calendar data in an Akonadi-aware client. If you installed **KOrganizer**, make sure the events are visible there. Merkuro Calendar can serve the same basic verification role when it is using the same Akonadi resources.
 
-A useful additional check is Plasma's **Digital Clock** calendar with event display enabled. Both it and Simple Plasma Agenda consume Akonadi/PIM calendar data; if neither can see the events, solve the Akonadi/resource configuration first.
+A particularly useful check is Plasma's **Digital Clock** calendar with the PIM Events plugin enabled. Both it and Simple Plasma Agenda consume the same Akonadi/PIM calendar path; if neither can see the events, solve the Akonadi/resource configuration first.
 
 ## 5. Install Simple Plasma Agenda locally
 
@@ -303,7 +340,7 @@ During development, saving calendar selections from Plasma's PIM calendar model 
 The widget currently provides:
 
 - first day of week: Sunday / Monday;
-- look-ahead: 1 / 3 / 5 / 7 / 14 / 21 / 28 days;
+- look-ahead: 1 / 3 / 5 / 7 days; 2 weeks (14 days); 3 weeks (21 days); 4 weeks (28 days);
 - Google forced synchronization every 5 minutes: on/off;
 - background: solid / translucent;
 - colors: follow system / light / dark;
