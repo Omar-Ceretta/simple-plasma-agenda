@@ -237,10 +237,15 @@ check_system() {
     fi
 
     if command -v akonadictl >/dev/null 2>&1; then
-        printf '%-24s ' "Akonadi:"
-        akonadictl status 2>&1 | head -n1 || true
+        local akonadi_status control_status server_status
+        akonadi_status="$(akonadictl status 2>&1 || true)"
+        control_status="$(printf '%s\n' "$akonadi_status" | sed -n 's/^Akonadi Control: //p' | head -n1)"
+        server_status="$(printf '%s\n' "$akonadi_status" | sed -n 's/^Akonadi Server: //p' | head -n1)"
+        printf '%-24s %s\n' "Akonadi Control:" "${control_status:-UNKNOWN}"
+        printf '%-24s %s\n' "Akonadi Server:" "${server_status:-UNKNOWN}"
     else
-        printf '%-24s %s\n' "Akonadi:" "MISSING"
+        printf '%-24s %s\n' "Akonadi Control:" "MISSING"
+        printf '%-24s %s\n' "Akonadi Server:" "MISSING"
     fi
 
     local pimevents
