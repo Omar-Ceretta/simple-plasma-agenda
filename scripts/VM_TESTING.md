@@ -22,6 +22,11 @@ The one part it **does not automate** is calendar account authentication. After 
 
 > If the plasmoid is already placed on the desktop, remove that instance before running `fresh` or `all`.
 
+```bash
+rm -rf ~/.cache/plasmashell/qmlcache
+systemctl --user restart plasma-plasmashell.service
+```
+
 ## Why the script does not rename `-main`
 
 A GitHub branch ZIP normally expands to a directory such as `simple-plasma-agenda-main`. We do **not** need to rename that folder manually. KDE's `kpackagetool6` reads `metadata.json` and installs the package according to the plugin ID `com.simple.plasma.agenda`.
