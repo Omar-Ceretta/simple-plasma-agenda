@@ -6,7 +6,7 @@ It is intentionally an agenda, not a full calendar: the monthly calendar view fr
 
 > **Development status**
 >
-> Current local development version: **0.2.16**.  
+> Current local development version: **0.2.17**.  
 > The widget has been tested so far on **Fedora KDE 44 / Plasma 6**. Package-name notes for other distributions are provided below as installation guidance only; they must not yet be read as a claim of tested support.
 
 ## Main features
@@ -20,8 +20,10 @@ It is intentionally an agenda, not a full calendar: the monthly calendar view fr
 - Compact, normal and airy density presets.
 - Small, normal and large event text sizes.
 - Past events are visually dimmed after their actual end time.
-- Clicking an event opens **KOrganizer on the day containing that event** and brings KOrganizer to the foreground.
-- Manual Google Calendar refresh and optional forced refresh every 5 minutes on systems where the required Qt D-Bus executable is available under the expected name.
+- Event cards have a subtle hover state and visible keyboard focus.
+- Event cards are reachable with **Tab / Shift+Tab** and activate with **Enter or Space**; accessibility metadata exposes them as buttons.
+- Clicking or keyboard-activating an event opens **KOrganizer on the day containing that event** and brings KOrganizer to the foreground.
+- Manual Google Calendar refresh and optional forced refresh every 5 minutes through Akonadi D-Bus, using `busctl` instead of distribution-specific Qt D-Bus command names.
 - Italian localization.
 
 ## How calendar data reaches the widget
@@ -59,8 +61,8 @@ For the **core agenda display**, you need:
 The following components are useful but have more specific roles:
 
 - **KOrganizer** is **not required merely to display events**. It is a full calendar application and is the easiest tested GUI for adding/checking Akonadi calendar resources. Simple Plasma Agenda also currently uses KOrganizer for the **click an event → open that day** feature. If KOrganizer is absent, the agenda can still display events, but that click action cannot open the calendar application.
-- **`qdbus-qt6`** is **not required for normal event display**. The current Fedora implementation uses it only for the widget's manual/5-minute **forced Google synchronization**. Normal Akonadi synchronization continues to be handled by the calendar resource itself.
-- **systemd** is not a calendar backend. On Fedora it manages the per-user Akonadi control service, and its `busctl` utility is currently used by the click-to-KOrganizer integration. There is normally no reason to enable Akonadi as a permanent system-wide root service.
+- **systemd / `busctl`** is **not required for the core event display**, but Simple Plasma Agenda currently uses `busctl --user` for two convenience features: forced Google-resource synchronization and click/keyboard activation of KOrganizer. The planned test distributions are systemd-based; systems without `busctl` can still display Akonadi events but those two actions will not work.
+- **systemd** is not a calendar backend. On Fedora it also manages the per-user Akonadi control service. There is normally no reason to enable Akonadi as a permanent system-wide root service.
 
 ## Multiple calendars and providers
 
@@ -99,13 +101,14 @@ These provide the pieces that matter to the widget:
 For the complete currently tested experience, also install:
 
 ```bash
-sudo dnf install korganizer qt6-qttools
+sudo dnf install korganizer
 ```
 
-- `korganizer` — recommended GUI for configuring/verifying calendars and required by the current **click event → open its day** action;
-- `qt6-qttools` — provides `qdbus-qt6`, used only by the widget's Fedora-tested forced Google synchronization feature.
+- `korganizer` — recommended GUI for configuring/verifying calendars and required by the current **click event → open its day** action.
 
-The core agenda display does **not** require a Google account, KOrganizer or `qdbus-qt6`; it requires calendar events to be available through Akonadi + `pimevents`.
+`busctl` is provided by Fedora's normal systemd installation and is used for the click action and forced Google synchronization. No Qt-specific `qdbus` package is required by Simple Plasma Agenda anymore.
+
+The core agenda display does **not** require a Google account, KOrganizer or `busctl`; it requires calendar events to be available through Akonadi + `pimevents`.
 
 ## 2. Check that Akonadi can run
 
@@ -213,36 +216,35 @@ KDE documents the per-user plasmoid location here:
 
 Normal event display still goes through Akonadi. The widget does not implement its own Google API client.
 
-In addition, Simple Plasma Agenda can currently detect Akonadi resources named like:
+In addition, Simple Plasma Agenda detects Akonadi resources named like:
 
 ```text
 akonadi_google_resource_*
 ```
 
-and request an immediate synchronization. The desktop refresh button does this manually; the corresponding option can repeat it every 5 minutes.
+and requests an immediate synchronization through the resource's public D-Bus interface. The desktop refresh button does this manually; the corresponding option can repeat it every 5 minutes.
 
-On the tested Fedora KDE 44 system, the command used for this is based on:
+Starting with development version **0.2.17**, this path uses **`busctl --user`** rather than a Qt-specific `qdbus` executable. The resource list is requested as lossless JSON and parsed inside QML; only resource names matching Akonadi's Google-resource naming convention are accepted.
+
+Conceptually, the two D-Bus calls are equivalent to:
 
 ```bash
-qdbus-qt6 \
+busctl --user --json=short call \
+  org.freedesktop.Akonadi \
+  /ResourceManager \
+  org.freedesktop.Akonadi.ResourceManager \
+  resourceInstances
+
+busctl --user --quiet call \
   org.freedesktop.Akonadi.Resource.akonadi_google_resource_0 \
   / \
-  org.freedesktop.Akonadi.Resource.synchronize
+  org.freedesktop.Akonadi.Resource \
+  synchronize
 ```
 
-`qt6-qttools` provides `qdbus-qt6` on Fedora 44.
+This removes the previous `qdbus-qt6` / `qdbus6` command-name difference between distributions. The planned VM distributions — Fedora, Kubuntu/Ubuntu-family systems, Arch Linux and openSUSE Tumbleweed — are systemd-based and normally provide `busctl` as part of systemd. This still needs real VM testing before being called supported.
 
-### Portability note
-
-The executable name is not identical on every distribution. For example, current Arch Linux `qt6-tools` provides `qdbus6`, not `qdbus-qt6`.
-
-Therefore:
-
-- **core Akonadi event display is independent of this forced-refresh command**;
-- the Google refresh button / 5-minute forced synchronization should currently be considered a **tested Fedora feature**, not yet a cross-distribution guarantee;
-- this command-name portability needs to be addressed and tested before declaring distributions such as Arch fully supported.
-
-The widget deliberately does **not** force synchronization of arbitrary Akonadi resources, because Akonadi may also contain mail, contacts and other agents. Only Google calendar resources are targeted by the current forced-sync implementation.
+The widget deliberately does **not** force synchronization of arbitrary Akonadi resources, because Akonadi may also contain mail, contacts and other agents. Only Google resources matching `akonadi_google_resource_*` are targeted. Other calendar sources remain visible through Akonadi and use their own synchronization mechanisms.
 
 ---
 
@@ -278,13 +280,15 @@ These commands are **starting points for planned VM testing**, not a compatibili
 
 ## Kubuntu / Ubuntu-family Plasma systems
 
-For current Ubuntu 26.04 package naming, the relevant packages include:
+For current Ubuntu package naming, the relevant PIM packages are:
 
 ```bash
-sudo apt install akonadi-server kdepim-runtime kdepim-addons korganizer qdbus-qt6
+sudo apt install akonadi-server kdepim-runtime kdepim-addons korganizer
 ```
 
-TUXEDO OS is Ubuntu-based, but its exact package/version combination still needs a real test before being documented as supported.
+No Qt-specific `qdbus` package is required by Simple Plasma Agenda 0.2.17: the optional D-Bus actions use `busctl` from the systemd userspace already present on normal Kubuntu/Ubuntu-family installations.
+
+TUXEDO OS and KDE neon are Ubuntu-family systems, but their exact preinstalled PIM components and versions still need real VM tests before being documented as supported.
 
 ## Arch Linux
 
@@ -294,11 +298,24 @@ Relevant package names are currently:
 sudo pacman -S akonadi kdepim-runtime kdepim-addons korganizer
 ```
 
-Arch's current `qt6-tools` package provides `qdbus6`; because Simple Plasma Agenda currently calls `qdbus-qt6` for forced Google synchronization, that convenience feature needs a portability adjustment before Arch can be considered fully supported.
+Arch uses systemd and therefore already provides the `busctl` path used by Simple Plasma Agenda 0.2.17. The previous `qdbus6` versus `qdbus-qt6` portability issue no longer applies; the Akonadi/PIM integration itself still needs real VM testing.
 
 ## openSUSE Tumbleweed
 
-The relevant package families include `akonadi`, `kdepim-runtime`, `kdepim-addons` and `korganizer`. Exact installation and D-Bus-tool naming will be documented only after a real Tumbleweed test.
+The current Tumbleweed package names to start from are `akonadi`, `kdepim-runtime`, `kdepim-addons` and `korganizer`. Tumbleweed is systemd-based, so the widget's D-Bus helper is expected to be `busctl` there as well. Exact installation behaviour and the presence/location of the Plasma `pimevents` plugin still need a real Tumbleweed test.
+
+## VM pre-flight checks
+
+Before diagnosing the widget itself on a new distribution, record these results:
+
+```bash
+plasmashell --version
+akonadictl status
+command -v busctl
+find /usr -type f -path '*/plasmacalendarplugins/pimevents.so' -print 2>/dev/null
+```
+
+Then verify that at least one calendar event is visible in an Akonadi-aware calendar application and, where available, in Plasma's Digital Clock calendar. This separates packaging/Akonadi problems from plasmoid problems before testing Simple Plasma Agenda.
 
 ---
 
