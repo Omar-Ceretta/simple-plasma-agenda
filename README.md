@@ -1,100 +1,326 @@
 # Simple Plasma Agenda
 
-A compact **agenda-only widget for KDE Plasma 6**. It keeps upcoming events visible directly on the desktop instead of hiding them behind a click on the Digital Clock.
+Simple Plasma Agenda is a compact **KDE Plasma 6** desktop widget that shows upcoming calendar events provided by **KDE PIM / Akonadi**.
 
-> **Project status:** early development (`0.2.x`). The core agenda and Google/Akonadi synchronization are already usable, but the visual configuration and cross-distribution testing are still being expanded.
+It is intentionally an agenda, not a full calendar: the monthly calendar view from the upstream project has been removed so the widget can stay permanently visible on the desktop and show only the next appointments.
 
-## Why this fork exists
+> **Development status**
+>
+> Current local development version: **0.2.15**.  
+> The widget has been tested so far on **Fedora KDE 44 / Plasma 6**. Package-name notes for other distributions are provided below as installation guidance only; they must not yet be read as a claim of tested support.
 
-Simple Plasma Agenda began as a derivative of the **Calendar** widget from Jack Faith's macOS/Liquid Glass widgets. The upstream widget combines a month calendar with an optional upcoming-events panel. This fork focuses exclusively on the agenda panel and reshapes it around a Plasma-native, always-visible desktop use case.
+## Main features
 
-For detailed provenance, preserved upstream credit and a summary of the differences, see [NOTICE.md](NOTICE.md).
+- Upcoming KDE PIM / Akonadi events directly on the Plasma desktop.
+- Look-ahead periods: **1, 3, 5, 7, 14, 21 or 28 days**.
+- Day sections for **Today**, **Tomorrow** and subsequent localized dates.
+- Week separators.
+- Solid or translucent background.
+- Follow-system, light or dark color mode.
+- Compact, normal and airy density presets.
+- Small, normal and large event text sizes.
+- Past events are visually dimmed after their actual end time.
+- Clicking an event opens **KOrganizer on the day containing that event** and brings KOrganizer to the foreground.
+- Manual Google Calendar refresh and optional forced refresh every 5 minutes on systems where the required Qt D-Bus executable is available under the expected name.
+- Italian localization.
 
-## Current features
+## How calendar data reaches the widget
 
-- upcoming events from **KDE PIM / Akonadi**;
-- Google Calendar works through the user's existing Akonadi configuration — no separate OAuth client or Google API project is required by this widget;
-- day-by-day grouping with locale-aware dates;
-- dedicated labels for **Today / Tomorrow** and separators between weeks;
-- 3, 5, 7 or 14 day look-ahead;
-- manual refresh button;
-- optional forced synchronization of **Akonadi Google resources every five minutes**;
-- solid or translucent background;
-- system/light/dark color modes;
-- Italian localization;
-- Plasma/system fonts rather than bundled Apple fonts.
+Simple Plasma Agenda does **not** connect directly to Google Calendar, Nextcloud or another online service.
 
-## Calendar sources
-
-The agenda reads events exposed by the Plasma **`pimevents`** backend, so it is not limited to Google Calendar. In principle, calendars provided to KDE PIM/Akonadi by Google, CalDAV/Nextcloud, iCalendar and other supported resources can be displayed.
-
-The current **forced refresh implementation is intentionally narrower**: it discovers and synchronizes resources matching `akonadi_google_resource_*`. Other Akonadi calendars remain visible, but their remote synchronization is left to their normal Akonadi resource behavior until those providers are explicitly tested.
-
-## Requirements
-
-- KDE Plasma 6;
-- KDE PIM / Akonadi calendar integration and the Plasma PIM events plugin;
-- at least one calendar source configured in Akonadi if remote events are desired;
-- `qdbus-qt6` for the current forced Google synchronization feature.
-
-If `qdbus-qt6` is unavailable, the widget can still display events already present in Akonadi, but the manual/automatic forced Google refresh cannot work.
-
-## Installation
-
-### Development / manual installation
-
-Copy the repository directory to:
+The data path is:
 
 ```text
-~/.local/share/plasma/plasmoids/com.simple.plasma.agenda/
+Remote/local calendar
+        ↓
+Akonadi calendar resource
+        ↓
+KDE PIM / pimevents Plasma plugin
+        ↓
+Simple Plasma Agenda
 ```
 
-Then add **Simple Plasma Agenda** from Plasma's *Add Widgets* dialog.
+This is important: if the event is not available in Akonadi, the widget cannot display it.
 
-When changing QML during development, Plasma can occasionally retain compiled QML caches. If a changed widget clearly behaves like an older version, remove it from the desktop and, only when necessary, clear:
+KDE documents Akonadi as the shared PIM storage/service layer used by KDE applications. Akonadi normally starts automatically when an Akonadi-enabled application requests it; `akonadictl` can also be used to start, stop, restart and inspect it manually:
+
+- https://userbase.kde.org/Akonadi
+
+The `pimevents` Plasma calendar plugin is supplied by **kdepim-addons** on the distributions investigated so far.
+
+---
+
+# Minimum setup — Fedora KDE 44
+
+This is the setup currently tested during development.
+
+## 1. Install the required KDE PIM components
+
+```bash
+sudo dnf install akonadi-server kdepim-runtime kdepim-addons korganizer qt6-qttools
+```
+
+Why these packages are relevant:
+
+- `akonadi-server` — the Akonadi service itself and `akonadictl`;
+- `kdepim-runtime` — Akonadi resources, including the Google resource on Fedora;
+- `kdepim-addons` — contains the Plasma `pimevents` calendar plugin used by this widget;
+- `korganizer` — convenient calendar configuration/verification tool and the application opened when an event is clicked;
+- `qt6-qttools` — provides `qdbus-qt6`, currently used by the widget's forced Google synchronization feature on Fedora.
+
+The core agenda display does not require a Google account. Any calendar source correctly exposed through Akonadi may be displayed.
+
+## 2. Check that Akonadi can run
+
+```bash
+akonadictl status
+```
+
+If it is not running:
+
+```bash
+akonadictl start
+```
+
+Akonadi is normally activated automatically when an Akonadi-aware application requests it, so there is generally no need to enable a service manually at every login.
+
+On Fedora 44, `akonadi-server` also installs the systemd **user** unit:
+
+```text
+akonadi_control.service
+```
+
+If Akonadi does not start, inspect it with:
+
+```bash
+systemctl --user status akonadi_control.service
+```
+
+If you had previously disabled Akonadi by **masking** that unit, undo the mask first:
+
+```bash
+systemctl --user unmask akonadi_control.service
+akonadictl start
+```
+
+Do not run Akonadi as root.
+
+## 3. Add at least one calendar to Akonadi
+
+The simplest tested route is KOrganizer.
+
+Open **KOrganizer** and go to:
+
+```text
+Settings → Configure KOrganizer… → General → Calendars → Add…
+```
+
+Alternatively, in KOrganizer's Calendar Manager sidebar, use **Add Calendar…**.
+
+KOrganizer can expose several Akonadi resource types, including for example:
+
+- **Google Calendars and Tasks**;
+- **DAV groupware resource** for CalDAV / Nextcloud;
+- **iCal Calendar File**;
+- other Akonadi-supported resources.
+
+KDE's current KOrganizer documentation describes the resource setup here:
+
+- https://docs.kde.org/stable_kf6/en/korganizer/korganizer/managing-data.html
+
+Complete any account authentication requested by the selected resource.
+
+## 4. Verify Akonadi before installing the widget
+
+Before troubleshooting Simple Plasma Agenda, make sure your events are visible in **KOrganizer**.
+
+A useful additional check is Plasma's **Digital Clock** calendar with event display enabled. Both it and Simple Plasma Agenda consume Akonadi/PIM calendar data; if neither can see the events, solve the Akonadi/resource configuration first.
+
+## 5. Install Simple Plasma Agenda locally
+
+Plasma installs per-user widgets under:
+
+```text
+~/.local/share/plasma/plasmoids/
+```
+
+After extracting the release ZIP, the final structure must be exactly:
+
+```text
+~/.local/share/plasma/plasmoids/
+└── com.simple.plasma.agenda/
+    ├── metadata.json
+    └── contents/
+        ├── config/
+        ├── locale/
+        └── ui/
+```
+
+For a manual installation from an extracted release directory:
+
+```bash
+mkdir -p ~/.local/share/plasma/plasmoids
+rm -rf ~/.local/share/plasma/plasmoids/com.simple.plasma.agenda
+cp -a com.simple.plasma.agenda ~/.local/share/plasma/plasmoids/
+```
+
+Then open Plasma's **Add Widgets…** interface and drag **Simple Plasma Agenda** onto the desktop.
+
+KDE documents the per-user plasmoid location here:
+
+- https://develop.kde.org/docs/plasma/widget/setup/
+
+---
+
+# Google Calendar synchronization
+
+Normal event display still goes through Akonadi. The widget does not implement its own Google API client.
+
+In addition, Simple Plasma Agenda can currently detect Akonadi resources named like:
+
+```text
+akonadi_google_resource_*
+```
+
+and request an immediate synchronization. The desktop refresh button does this manually; the corresponding option can repeat it every 5 minutes.
+
+On the tested Fedora KDE 44 system, the command used for this is based on:
+
+```bash
+qdbus-qt6 \
+  org.freedesktop.Akonadi.Resource.akonadi_google_resource_0 \
+  / \
+  org.freedesktop.Akonadi.Resource.synchronize
+```
+
+`qt6-qttools` provides `qdbus-qt6` on Fedora 44.
+
+### Portability note
+
+The executable name is not identical on every distribution. For example, current Arch Linux `qt6-tools` provides `qdbus6`, not `qdbus-qt6`.
+
+Therefore:
+
+- **core Akonadi event display is independent of this forced-refresh command**;
+- the Google refresh button / 5-minute forced synchronization should currently be considered a **tested Fedora feature**, not yet a cross-distribution guarantee;
+- this command-name portability needs to be addressed and tested before declaring distributions such as Arch fully supported.
+
+The widget deliberately does **not** force synchronization of arbitrary Akonadi resources, because Akonadi may also contain mail, contacts and other agents. Only Google calendar resources are targeted by the current forced-sync implementation.
+
+---
+
+# Clicking an event
+
+A click currently performs this safe fallback:
+
+```text
+click event
+   ↓
+KOrganizer opens the event's day
+   ↓
+KWin brings KOrganizer to the foreground
+```
+
+It does **not yet open the individual event editor**.
+
+The current Plasma calendar QML wrapper does not expose the source event UID even though the underlying KDE calendar event data contains it. Until that is exposed upstream, opening the correct day is used instead of guessing an event by title/time or reading Akonadi's database directly.
+
+This feature currently relies on:
+
+- KOrganizer's D-Bus calendar interface;
+- `busctl --user` from systemd;
+- KWin's Windows Runner, available in the Plasma desktop session.
+
+If these components are unavailable, the agenda itself can still display events; only the click action will fail to open KOrganizer.
+
+---
+
+# Other distributions — package guidance, not yet tested support
+
+These commands are **starting points for planned VM testing**, not a compatibility claim.
+
+## Kubuntu / Ubuntu-family Plasma systems
+
+For current Ubuntu 26.04 package naming, the relevant packages include:
+
+```bash
+sudo apt install akonadi-server kdepim-runtime kdepim-addons korganizer qdbus-qt6
+```
+
+TUXEDO OS is Ubuntu-based, but its exact package/version combination still needs a real test before being documented as supported.
+
+## Arch Linux
+
+Relevant package names are currently:
+
+```bash
+sudo pacman -S akonadi kdepim-runtime kdepim-addons korganizer
+```
+
+Arch's current `qt6-tools` package provides `qdbus6`; because Simple Plasma Agenda currently calls `qdbus-qt6` for forced Google synchronization, that convenience feature needs a portability adjustment before Arch can be considered fully supported.
+
+## openSUSE Tumbleweed
+
+The relevant package families include `akonadi`, `kdepim-runtime`, `kdepim-addons` and `korganizer`. Exact installation and D-Bus-tool naming will be documented only after a real Tumbleweed test.
+
+---
+
+# Troubleshooting
+
+## The widget loads but shows no events
+
+Check in this order:
+
+1. Does `akonadictl status` report a working Akonadi instance?
+2. Do the events appear in KOrganizer?
+3. Is `kdepim-addons` installed, including the Plasma `pimevents` plugin?
+4. Does Plasma's Digital Clock see the same events when event display is enabled?
+5. Only after those checks, investigate the widget itself.
+
+## Plasma appears to use an older QML version
+
+During development or after replacing files manually, Plasma may retain compiled QML from an older version.
+
+Use this only when the installed files and the observed behaviour clearly disagree:
 
 ```bash
 rm -rf ~/.cache/plasmashell/qmlcache
 systemctl --user restart plasma-plasmashell.service
 ```
 
-### Packaged installation
+A restart is especially worth trying after changes to configuration keys, translations or theme-related QML. It should not be necessary for every ordinary update.
 
-A `.plasmoid` package can be built with:
+## Calendar selection
 
-```bash
-./scripts/package.sh
-```
+Simple Plasma Agenda intentionally does **not** provide checkboxes to enable/disable individual PIM calendars.
 
-and installed with Plasma's *Install Widget From Local File* dialog or with `kpackagetool6`.
+During development, saving calendar selections from Plasma's PIM calendar model was found to be able to crash `plasmashell`; the same failure was reproducible in the upstream widget. Calendar/resource administration is therefore left to KOrganizer/Akonadi rather than duplicated inside this widget.
 
-## Configuration philosophy
+---
 
-Simple Plasma Agenda deliberately does **not** expose calendar/account selection controls. Account and collection management belong to KDE PIM/Akonadi applications such as KOrganizer/Merkuro. This keeps the widget small and avoids a calendar-selection crash path observed in Plasma during development.
+# Current configuration
 
-The default first day of the week is **Monday**. The user can switch it to Sunday from the Agenda settings.
+The widget currently provides:
 
-## Privacy and credentials
+- first day of week: Sunday / Monday;
+- look-ahead: 1 / 3 / 5 / 7 / 14 / 21 / 28 days;
+- Google forced synchronization every 5 minutes: on/off;
+- background: solid / translucent;
+- colors: follow system / light / dark;
+- density: compact / normal / airy;
+- event text size: small / normal / large;
+- corner radius.
 
-Simple Plasma Agenda does not implement its own Google OAuth flow and does not store Google credentials. It reads data already synchronized by KDE PIM/Akonadi. The forced Google refresh asks the existing Akonadi Google resource to synchronize through the local D-Bus interface.
+The default look-ahead is **7 days**, the default first day is **Monday**, and the default corner radius is **16 px**.
 
-## Testing
+---
 
-Testing is being expanded across several Plasma distributions and clean virtual machines. The current matrix, including planned environments, is maintained in [TESTING.md](TESTING.md).
+# Project origin
 
-## AI-assisted development
+Simple Plasma Agenda is a fork/derivative of **macOS Calendar 1.1** by **Jack Faith (`jaxparrow07`)**. The original project provided a monthly calendar, agenda and Plasma/KDE PIM integration; this fork focuses on a compact always-visible agenda panel.
 
-This project has been developed with substantial assistance from **OpenAI ChatGPT** for source analysis, QML implementation/refactoring, debugging, documentation and test planning. Functional goals, design choices, manual tests and acceptance/rejection of proposed changes are directed by the **Author**.
+The upstream author is credited as the author of the project from which this work derives, not as a maintainer or co-author of Simple Plasma Agenda.
 
-The project does not present AI-generated output as independently verified code: changes are intended to be reviewed and tested on real Plasma systems before release. See [AI_ASSISTED_DEVELOPMENT.md](AI_ASSISTED_DEVELOPMENT.md).
+Simple Plasma Agenda is maintained by **Omar Ceretta** and is licensed under **GPL-3.0**.
 
-## License
-
-GPL-3.0. See [LICENSE](LICENSE).
-
-## Credits
-
-- **Omar Ceretta** — author and maintainer of Simple Plasma Agenda.
-- **Jack Faith (`jaxparrow07`)** — author of the upstream macOS Calendar widget on which this project was based.
-
-Upstream attribution is documented in [NOTICE.md](NOTICE.md).
+Development is **human-directed, AI-assisted**: requirements, acceptance decisions and real-system testing are performed by the maintainer; ChatGPT is used to assist with source analysis, QML changes, debugging, documentation and test planning.
