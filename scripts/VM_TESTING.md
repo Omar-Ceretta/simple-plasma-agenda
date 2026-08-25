@@ -167,6 +167,13 @@ Configure at least one Akonadi-backed calendar resource and authenticate it. Exa
 
 Before testing Simple Plasma Agenda, confirm that the event is visible in KOrganizer (or another Akonadi-aware client) and, ideally, in Plasma's Digital Clock PIM events view. If those cannot see the event either, debug Akonadi/resource configuration first.
 
+# Open KOrganizer and go to:
+
+Settings → Configure KOrganizer… → General → Calendars → Add…
+
+Alternatively, in KOrganizer's Calendar Manager sidebar, use Add Calendar….
+
+
 # What to record for every VM
 
 Copy the output of:
