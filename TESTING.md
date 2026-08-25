@@ -84,6 +84,56 @@ The Kubuntu VM used SDDM automatic login. A password-protected KWallet therefore
 
 The tested Kubuntu installation did not expose `akonadi_control.service` as a systemd user unit. Akonadi itself was managed and inspected with `akonadictl`.
 
+### Arch Linux + KDE Plasma — PASS on 0.2.19
+
+Fresh Arch Linux VM tested with the distribution packages current during the test cycle. Recorded package versions included:
+
+- `kdepim-runtime 26.08.0-1`;
+- `korganizer 26.08.0-1`;
+- `kwallet 6.29.0-1`;
+- `qca-qt6 2.3.10-8`;
+- `openssl 3.6.3-1`.
+
+Verified:
+
+- dependency installation through `scripts/vm-test-setup.sh`;
+- Akonadi Control and Server running normally;
+- Google Calendar authentication and synchronization through the Akonadi Google resource;
+- Google events visible in KOrganizer;
+- the same events visible in Plasma's Digital Clock;
+- the same events visible in Simple Plasma Agenda;
+- manual Google refresh;
+- automatic Google refresh, including the delayed first sync after plasmoid startup;
+- event click opens the correct day in KOrganizer;
+- hover behavior;
+- basic keyboard/accessibility behavior;
+- appearance/configuration controls;
+- logout/login with automatic Google synchronization enabled;
+- after login and the delayed first automatic sync, `akonadictl status` remained:
+
+```text
+Akonadi Control: running
+Akonadi Server: running
+```
+
+The Arch test therefore confirmed that the 20-second startup delay introduced in 0.2.19 also avoids destabilizing Akonadi on this VM.
+
+#### Arch KWallet / Secret Service incident — upstream, not Simple Plasma Agenda
+
+During the **initial Google-account setup, before Simple Plasma Agenda was added to the desktop**, the PAM-launched process
+
+```text
+/usr/bin/ksecretd --pam-login 8 9
+```
+
+crashed with `SIGSEGV`. The backtrace passed through `EVP_CIPHER_CTX_set_key_length()`, `libqca-ossl.so` and `QCA::Cipher::setup()`. The package combination was `kwallet 6.29.0-1`, `qca-qt6 2.3.10-8`, and `openssl 3.6.3-1`, matching contemporaneous upstream KDE reports (bugs 524522 / 524636).
+
+After the crash, the Google Akonadi resource remained offline because its credential was not available in the password store. The journal contained messages including `Can't find session /org/freedesktop/secrets/session/1` and `Account ... not found in password store`. Akonadi itself remained `Control: running` / `Server: running`.
+
+For this VM test, only the affected session services were restarted: `ksecretd` and `kwalletd6` were stopped and then reactivated through their D-Bus services, without deleting or resetting the Akonadi database. Re-authenticating the existing Google resource then succeeded. The resource reported `status = 0`, `online = true`, `statusMessage = "Pronto"`, and events appeared normally in KOrganizer and Plasma's Digital Clock before the plasmoid was introduced.
+
+Because the failure was reproduced entirely upstream of Simple Plasma Agenda and disappeared once KWallet/Secret Service was restored, it is recorded as a **distribution/KDE PIM environment issue**, not a widget limitation. The later Simple Plasma Agenda logout/login test passed.
+
 ## Known project limitations relevant to testing
 
 - Calendar source selection is intentionally **not** implemented inside the plasmoid. Saving PIM calendar selections through Plasma's PIM model was found to crash `plasmashell`; source administration remains in Akonadi/KOrganizer.
@@ -94,8 +144,7 @@ The tested Kubuntu installation did not expose `akonadi_control.service` as a sy
 
 These environments are **not yet recorded as passed**:
 
-- Arch Linux + KDE Plasma — next planned test;
-- openSUSE Tumbleweed KDE;
+- openSUSE Tumbleweed KDE — next planned test;
 - TUXEDO OS (record the exact Debian/Ubuntu base used);
 - KDE neon;
 - an additional fresh Fedora KDE installation if useful before public release.

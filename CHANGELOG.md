@@ -13,6 +13,8 @@ Simple Plasma Agenda is still under local pre-release development. These entries
 ### Tested
 
 - Kubuntu 26.04 LTS / Plasma 6.6.4 passed logout/login with automatic Google synchronization enabled, with events visible in both Plasma's Digital Clock and Simple Plasma Agenda.
+- Arch Linux + KDE Plasma passed the 0.2.19 VM test cycle: Akonadi/pimevents event display, Google manual and automatic refresh, click-to-KOrganizer, interaction/configuration checks, and logout/login with Akonadi remaining `Control: running` / `Server: running`.
+- An unrelated `ksecretd --pam-login` / QCA / OpenSSL crash encountered while initially configuring Google on the Arch VM was isolated before the plasmoid was added and recorded as an upstream environment issue in `TESTING.md`.
 
 ## 0.2.18 — 2026-08-25
 

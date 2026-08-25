@@ -7,7 +7,7 @@ It is intentionally an agenda, not a full calendar: the monthly calendar view fr
 > **Development status**
 >
 > Current local development version: **0.2.19**.  
-> The widget has been tested on **Fedora KDE 44 / Plasma 6** and **Kubuntu 26.04 LTS / Plasma 6.6.4**. Other distribution notes below are still installation guidance until those environments are tested explicitly.
+> The widget has been tested on **Fedora KDE 44 / Plasma 6**, **Kubuntu 26.04 LTS / Plasma 6.6.4**, and **Arch Linux + KDE Plasma**. Other distribution notes below are still installation guidance until those environments are tested explicitly.
 
 ## Main features
 
@@ -242,7 +242,7 @@ busctl --user --quiet call \
   synchronize
 ```
 
-This removes the previous `qdbus-qt6` / `qdbus6` command-name difference between distributions. Fedora KDE 44 and Kubuntu 26.04 LTS have now been tested with the `busctl` path. Arch Linux and openSUSE Tumbleweed remain planned VM tests.
+This removes the previous `qdbus-qt6` / `qdbus6` command-name difference between distributions. Fedora KDE 44, Kubuntu 26.04 LTS and Arch Linux have now been tested with the `busctl` path. openSUSE Tumbleweed remains a planned VM test.
 
 The widget deliberately does **not** force synchronization of arbitrary Akonadi resources, because Akonadi may also contain mail, contacts and other agents. Only Google resources matching `akonadi_google_resource_*` are targeted. Other calendar sources remain visible through Akonadi and use their own synchronization mechanisms.
 
@@ -276,7 +276,7 @@ If these components are unavailable, the agenda itself can still display events;
 
 # Distribution notes and test status
 
-Fedora KDE 44 and Kubuntu 26.04 LTS have been tested during development. Commands for the other distributions remain **starting points for planned VM testing**, not compatibility claims.
+Fedora KDE 44, Kubuntu 26.04 LTS and Arch Linux have been tested during development. Commands for the other distributions remain **starting points for planned VM testing**, not compatibility claims.
 
 ## Kubuntu 26.04 LTS — tested
 
@@ -294,15 +294,17 @@ Version 0.2.19 passed a logout/login test with automatic Google synchronization 
 
 TUXEDO OS and KDE neon are still separate, untested environments even though they use APT-family packaging.
 
-## Arch Linux
+## Arch Linux — tested
 
-Relevant package names are currently:
+The Arch Linux VM passed the 0.2.19 test cycle with the distribution's current KDE PIM packages at the time of testing, including `kdepim-runtime 26.08.0-1` and `korganizer 26.08.0-1`. Relevant package names are:
 
 ```bash
 sudo pacman -S akonadi kdepim-runtime kdepim-addons korganizer
 ```
 
-Arch uses systemd and therefore is expected to provide the `busctl` path used by current Simple Plasma Agenda versions. The previous `qdbus6` versus `qdbus-qt6` portability issue no longer applies; the Akonadi/PIM integration itself still needs real VM testing.
+Verified on the VM: Google Calendar through Akonadi, events in KOrganizer, Plasma's Digital Clock and Simple Plasma Agenda, manual and automatic Google synchronization, event click opening the correct day in KOrganizer, hover and basic keyboard/accessibility behavior, appearance configuration, and logout/login with automatic synchronization enabled. After the delayed first automatic sync, `akonadictl status` remained `Control: running` / `Server: running`.
+
+During the initial Google-account setup, before Simple Plasma Agenda had been added to the desktop, the VM hit an upstream `ksecretd --pam-login` crash in the QCA/OpenSSL path. The affected session used `kwallet 6.29.0-1`, `qca-qt6 2.3.10-8` and `openssl 3.6.3-1`. Reinitializing the KWallet/Secret Service processes in the current session and authenticating the Google resource again restored normal operation. This was treated as an Arch/KDE wallet issue, not a plasmoid defect; see `TESTING.md` for the recorded diagnosis.
 
 ## openSUSE Tumbleweed
 
