@@ -335,6 +335,7 @@ PlasmoidItem {
     // to activate its window. All command parameters are generated/validated here;
     // no event text is ever interpolated into a shell command.
     readonly property string _korganizerMatchCommand: "busctl --user --json=short call org.kde.KWin /WindowsRunner org.kde.krunner1 Match s korganizer"
+    readonly property string _korganizerShowCommand: "korganizer"
     property string _eventOpenShowDateCommand: ""
     property string _eventOpenRunCommand: ""
     property int _eventOpenMatchAttempts: 0
@@ -407,6 +408,20 @@ PlasmoidItem {
         var stdout = data["stdout"] ? data["stdout"].toString() : "";
 
         if (source === _eventOpenShowDateCommand) {
+            if (exitCode === 0) {
+                // On some distributions (notably Kubuntu 26.04), D-Bus activation
+                // starts KOrganizer and applies the date without materializing its
+                // main window. Launching the application once asks the existing
+                // single-instance process to show its window; KWin then handles
+                // foreground activation in the next step.
+                eventOpenRunner.connectSource(_korganizerShowCommand);
+            } else {
+                _eventOpenInProgress = false;
+            }
+            return;
+        }
+
+        if (source === _korganizerShowCommand) {
             if (exitCode === 0) {
                 _requestKOrganizerWindowMatch();
             } else {
