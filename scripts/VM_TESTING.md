@@ -106,7 +106,21 @@ akonadictl start
 
 If APT cannot find one of the KDE PIM packages, check that the Ubuntu **Universe** repository is enabled. The relevant KDE PIM packages are published in Universe.
 
-Development status: **planned test; not yet claimed as supported**.
+Development status: **PASS on Simple Plasma Agenda 0.2.19**.
+
+Tested VM details:
+
+- Ubuntu 26.04 LTS (Resolute Raccoon) / Kubuntu desktop;
+- Plasma 6.6.4;
+- KOrganizer 6.6.3 / KDE PIM 25.12.3;
+- `busctl` at `/usr/bin/busctl`;
+- `pimevents.so` at `/usr/lib/x86_64-linux-gnu/qt6/plugins/plasmacalendarplugins/pimevents.so`.
+
+Important test finding: 0.2.18 could race Akonadi at session startup because the first forced Google sync happened after only 1.5 seconds. Version 0.2.19 delays the first automatic sync to **20 seconds**; logout/login with automatic sync enabled then passed, with `Akonadi Control: running`, `Akonadi Server: running`, and events visible in both Plasma's Digital Clock and Simple Plasma Agenda. See `TESTING.md` for the full A/B diagnosis.
+
+On this Kubuntu installation there was no `akonadi_control.service` systemd user unit. Use `akonadictl` for Akonadi lifecycle/status checks rather than assuming the Fedora unit exists.
+
+If the VM uses SDDM automatic login and KWallet is password-protected, KWallet may ask for its password after reboot; that is a desktop/session configuration issue rather than a plasmoid requirement.
 
 ## KDE neon
 
@@ -203,6 +217,8 @@ Then test at least:
 - event click opens the correct day in KOrganizer and brings it forward;
 - manual Google refresh when a Google Akonadi resource exists;
 - automatic Google refresh every 5 minutes;
+- **logout/login with automatic Google refresh enabled**, followed by `akonadictl status` confirming both Control and Server are running;
+- events still visible in Plasma's Digital Clock and Simple Plasma Agenda after the delayed first automatic sync;
 - multiple calendar providers together when available.
 
 Record **actual results**, not expected support, in the repository TESTING.md.
