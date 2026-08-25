@@ -10,9 +10,14 @@
         <entry name="styleMode" type="Int"><default>1</default></entry>
         <!-- 0 = dark, 1 = light, 2 = follow Plasma -->
         <entry name="appearance" type="Int"><default>2</default></entry>
-        <entry name="cornerRadius" type="Int"><default>14</default></entry>
+        <entry name="cornerRadius" type="Int"><default>16</default></entry>
+        <!-- 0 = compact, 1 = normal, 2 = airy -->
+        <entry name="densityMode" type="Int"><default>1</default></entry>
+        <!-- 0 = small, 1 = normal, 2 = large -->
+        <entry name="eventTextSize" type="Int"><default>1</default></entry>
         <entry name="firstDayOfWeek" type="Int"><default>1</default></entry>
-        <entry name="eventLookaheadDays" type="Int"><default>2</default></entry>
+        <!-- Actual number of agenda days shown. -->
+        <entry name="lookaheadDays" type="Int"><default>7</default></entry>
         <entry name="enabledCalendarPlugins" type="StringList"><default>pimevents</default></entry>
         <entry name="autoSyncGoogle" type="Bool"><default>true</default></entry>
     </group>

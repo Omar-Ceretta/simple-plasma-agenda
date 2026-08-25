@@ -26,10 +26,6 @@ QtObject {
         ? Kirigami.Theme.textColor
         : (isLight ? "#202124" : "#f5f5f5")
 
-    readonly property color accent: useSystem
-        ? Kirigami.Theme.highlightColor
-        : "#3daee9"
-
     readonly property color separator: foreground
     readonly property color cardBackground: foreground
     readonly property real cardBackgroundOpacity: isTranslucent ? 0.075 : 0.055
