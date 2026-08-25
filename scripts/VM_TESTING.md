@@ -141,7 +141,11 @@ sudo pacman -Syu --needed akonadi kdepim-runtime kdepim-addons korganizer curl u
 akonadictl start
 ```
 
-Development status: **planned test; not yet claimed as supported**.
+Development status: **PASS on Simple Plasma Agenda 0.2.19**.
+
+Verified on the test VM: Google/Akonadi events in KOrganizer, Plasma's Digital Clock and Simple Plasma Agenda; manual and automatic Google refresh; click-to-KOrganizer; interaction/configuration checks; and logout/login with `Akonadi Control: running` / `Akonadi Server: running` after the delayed first automatic sync.
+
+The VM also exposed an upstream KWallet/Secret Service problem during the initial Google setup, before the plasmoid was added: `ksecretd --pam-login` crashed in the QCA/OpenSSL path with `kwallet 6.29.0-1`, `qca-qt6 2.3.10-8` and `openssl 3.6.3-1`. Restarting only `ksecretd`/`kwalletd6` in the current session and authenticating the Google resource again restored normal operation. Do not diagnose this particular failure as a Simple Plasma Agenda issue; see the Arch section in `TESTING.md`.
 
 ## openSUSE Tumbleweed KDE
 
