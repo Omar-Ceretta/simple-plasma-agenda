@@ -10,7 +10,7 @@ Versione di sviluppo corrente: **0.2.21**.
 
 | Ambiente | Plasma | Build SPA provata | Esito |
 | --- | --- | --- | --- |
-| Fedora KDE 44 | Plasma 6 | sviluppo 0.2.x | PASS |
+| Fedora KDE 44 | Plasma 6 | 0.2.21 | PASS |
 | Kubuntu 26.04 LTS | 6.6.4 | 0.2.19 | PASS |
 | Arch Linux + KDE | Plasma 6 | 0.2.19 | PASS |
 | openSUSE Tumbleweed | 6.7.4 | 0.2.19 | PASS |
@@ -44,7 +44,7 @@ Nel corso dei test sono stati verificati, a seconda dell'ambiente:
 
 ## Validazione installer assistito
 
-Su Fedora KDE 44 è stato eseguito anche un test da VM ripulita da KDE PIM/Akonadi: installazione dipendenze, avvio Akonadi, configurazione Google in KOrganizer, selettore Akonadi, scrittura di `PIMEventsPlugin/calendars=27` e installazione del `.plasmoid`. Il test ha inoltre individuato due casi ora gestiti nell'installer: stack KDE/PIM non allineato dopo installazione da ISO e necessità di ricaricare Plasma dopo una nuova selezione `pimevents`. Il comportamento del reload via `plasma-plasmashell.service` è stato verificato manualmente; l'integrazione automatica aggiornata resta da ritestare end-to-end.
+Su Fedora KDE 44 è stato eseguito un test end-to-end da VM ripulita da KDE PIM/Akonadi: installazione dipendenze, avvio Akonadi, configurazione Google in KOrganizer, selettore Akonadi, scrittura di `PIMEventsPlugin/calendars=27`, reload automatico di Plasma quando necessario e installazione del `.plasmoid`: **PASS**. È stato inoltre verificato che il reload non venga proposto quando la selezione non cambia e che SPA mostri subito gli eventi dopo una nuova selezione, senza reboot. Durante il test è stato riprodotto anche un caso di stack KDE/PIM non allineato; il relativo controllo runtime e la proposta di aggiornamento sono ora presenti nell'installer, ma quel ramo di recupero non è stato rieseguito end-to-end dopo la modifica.
 
 ## Preflight minimo
 
@@ -68,7 +68,7 @@ Current development version: **0.2.21**.
 
 | Environment | Plasma | SPA build tested | Result |
 | --- | --- | --- | --- |
-| Fedora KDE 44 | Plasma 6 | development 0.2.x | PASS |
+| Fedora KDE 44 | Plasma 6 | 0.2.21 | PASS |
 | Kubuntu 26.04 LTS | 6.6.4 | 0.2.19 | PASS |
 | Arch Linux + KDE | Plasma 6 | 0.2.19 | PASS |
 | openSUSE Tumbleweed | 6.7.4 | 0.2.19 | PASS |
@@ -102,7 +102,7 @@ Across the tested environments, the following were verified as applicable:
 
 ## Assisted-installer validation
 
-Fedora KDE 44 was also tested from a VM cleaned of KDE PIM/Akonadi: dependency installation, Akonadi startup, Google setup in KOrganizer, Akonadi selector, writing `PIMEventsPlugin/calendars=27`, and `.plasmoid` installation. The test also exposed two cases now handled by the installer: an out-of-sync KDE/PIM package stack after installing from an older ISO, and the need to reload Plasma after a new `pimevents` selection. Reload behavior through `plasma-plasmashell.service` was verified manually; the updated automatic integration still needs one end-to-end retest.
+Fedora KDE 44 was tested end-to-end from a VM cleaned of KDE PIM/Akonadi: dependency installation, Akonadi startup, Google setup in KOrganizer, Akonadi selector, writing `PIMEventsPlugin/calendars=27`, automatic Plasma reload when required, and `.plasmoid` installation: **PASS**. It was also verified that no reload is offered when the selection is unchanged and that SPA shows events immediately after a changed selection, without a reboot. An out-of-sync KDE/PIM stack was also reproduced during testing; the related runtime check and update offer are now present in the installer, but that recovery branch has not been re-run end-to-end after the change.
 
 ## Minimal preflight
 

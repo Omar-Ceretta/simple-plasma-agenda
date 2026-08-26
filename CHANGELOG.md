@@ -20,6 +20,7 @@
 - Aggiunto un controllo runtime di KOrganizer: se i pacchetti risultano installati ma le librerie di sistema non sono allineate, l'installer propone un aggiornamento completo tramite il package manager rilevato, previa conferma.
 - Dopo una modifica alla selezione `pimevents`, l'installer propone un reload rapido di Plasma (`plasma-plasmashell.service`, con fallback `plasmashell --replace`) per applicare subito la nuova lista senza reboot.
 - Rimossi dall'output normale dell'installer i riferimenti non necessari agli eventi PIM dell'Orologio digitale.
+- Validato su Fedora KDE 44 il flusso assistito completo da VM ripulita da KDE PIM/Akonadi: configurazione Google, selettore Akonadi, reload automatico di Plasma solo quando necessario, installazione SPA e visualizzazione immediata degli eventi: **PASS**.
 
 ### 0.2.20 — 2026-08-26
 
@@ -64,6 +65,7 @@
 - Added a KOrganizer runtime check: if packages are installed but system libraries are out of sync, the installer offers a full update through the detected package manager, with confirmation first.
 - After a changed `pimevents` selection, the installer offers a quick Plasma reload (`plasma-plasmashell.service`, with `plasmashell --replace` fallback) so the new list takes effect immediately without a reboot.
 - Removed unnecessary Digital Clock PIM Events references from normal installer output.
+- Validated the full assisted flow on Fedora KDE 44 from a VM cleaned of KDE PIM/Akonadi: Google setup, Akonadi selector, automatic Plasma reload only when required, SPA installation, and immediate event display: **PASS**.
 
 ### 0.2.20 — 2026-08-26
 
