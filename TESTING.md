@@ -45,7 +45,7 @@ Nel corso dei test sono stati verificati, a seconda dell'ambiente:
 
 ## Validazione installer assistito
 
-`scripts/install.sh` è stato aggiunto dopo i test distro sopra elencati. Il suo test completo da una VM senza KDE PIM/Akonadi è **ancora da eseguire** e non viene conteggiato come PASS in questo file.
+`scripts/install.sh` è stato aggiunto dopo i test distro sopra elencati. Il suo test completo da una VM senza KDE PIM/Akonadi è **ancora da eseguire** e non viene conteggiato come PASS in questo file. La modalità standalone con download dell'asset `.plasmoid` sarà verificata separatamente; prima della pubblicazione può essere provata con un URL di test tramite la variabile `SPA_PLASMOID_URL`.
 
 ## Preflight minimo
 
@@ -104,7 +104,7 @@ Across the tested environments, the following were verified as applicable:
 
 ## Assisted-installer validation
 
-`scripts/install.sh` was added after the distribution tests listed above. A full test starting from a VM without KDE PIM/Akonadi is **still pending** and is not counted as a PASS in this file.
+`scripts/install.sh` was added after the distribution tests listed above. A full test starting from a VM without KDE PIM/Akonadi is **still pending** and is not counted as a PASS in this file. Standalone mode with `.plasmoid` asset download will be verified separately; before publication it can be tested against a temporary URL through the `SPA_PLASMOID_URL` environment variable.
 
 ## Minimal preflight
 

@@ -9,6 +9,9 @@
 - Tooltip del titolo aggiornato a: **«Clicca su un evento per aprirne il giorno su KOrganizer»**.
 - PASS completo su TUXEDO OS Debian-based / Plasma 6.7.2 e KDE neon User Edition 24.04 / Plasma 6.7.4.
 - Aggiunto `scripts/install.sh`: installer assistito con rilevamento `dnf` / `apt` / `pacman` / `zypper`, consenso prima di `sudo` e checkpoint manuale prima dell’installazione del plasmoide.
+- `install.sh` reso utilizzabile anche come script standalone: fuori dal repository scarica automaticamente `Simple-Plasma-Agenda.plasmoid` dall'ultima release GitHub.
+- `scripts/package.sh` genera sia l'artefatto versionato sia il nome stabile `Simple-Plasma-Agenda.plasmoid` destinato alle release.
+- README ampliato con installazione rapida via `curl`/`wget` e procedura passo passo per configurare Google Calendar in KOrganizer, con Merkuro indicato come alternativa.
 
 ### 0.2.20 — 2026-08-26
 
@@ -42,6 +45,9 @@
 - Updated the title tooltip to: **“Clicca su un evento per aprirne il giorno su KOrganizer”**.
 - Full PASS on TUXEDO OS Debian-based / Plasma 6.7.2 and KDE neon User Edition 24.04 / Plasma 6.7.4.
 - Added `scripts/install.sh`: assisted installer with `dnf` / `apt` / `pacman` / `zypper` detection, confirmation before `sudo`, and a manual checkpoint before widget installation.
+- Made `install.sh` usable as a standalone script: outside a repository checkout it automatically downloads `Simple-Plasma-Agenda.plasmoid` from the latest GitHub release.
+- `scripts/package.sh` now creates both the versioned artifact and the stable `Simple-Plasma-Agenda.plasmoid` release asset.
+- Expanded the README with quick `curl`/`wget` installation and step-by-step Google Calendar setup in KOrganizer, with Merkuro documented as an alternative.
 
 ### 0.2.20 — 2026-08-26
 

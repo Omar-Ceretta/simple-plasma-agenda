@@ -56,37 +56,54 @@ Se gli eventi non sono visibili in Akonadi e in `pimevents`, Simple Plasma Agend
 
 ## Installazione
 
-### Se KDE PIM / Akonadi sono già configurati
+Prima di scegliere il metodo di installazione, fai questa distinzione:
 
-Puoi usare il normale pacchetto `.plasmoid` o, quando disponibile, **Aggiungi elementi grafici… → Scarica nuovi elementi grafici…** in Plasma.
+- se i tuoi eventi sono già visibili in **KOrganizer** e nel calendario dell'**Orologio digitale di Plasma**, puoi installare direttamente il plasmoide;
+- se non usi ancora KDE PIM / Akonadi, oppure non sai se siano configurati, è consigliata l'**installazione assistita**.
 
-Per un pacchetto locale:
+### Installazione assistita — consigliata se parti da Plasma senza PIM
+
+Quando il repository sarà pubblico, il modo più rapido sarà scaricare ed eseguire **solo** `install.sh`.
+
+Con `curl`:
 
 ```bash
-kpackagetool6 -t Plasma/Applet -i com.simple.plasma.agenda-0.2.21.zip
+curl -fsSLo /tmp/simple-plasma-agenda-install.sh \
+  https://raw.githubusercontent.com/Omar-Ceretta/simple-plasma-agenda/main/scripts/install.sh \
+  && chmod +x /tmp/simple-plasma-agenda-install.sh \
+  && /tmp/simple-plasma-agenda-install.sh
 ```
 
-L'installazione per utente finisce sotto:
+Oppure con `wget`:
 
-```text
-~/.local/share/plasma/plasmoids/com.simple.plasma.agenda/
+```bash
+wget -qO /tmp/simple-plasma-agenda-install.sh \
+  https://raw.githubusercontent.com/Omar-Ceretta/simple-plasma-agenda/main/scripts/install.sh \
+  && chmod +x /tmp/simple-plasma-agenda-install.sh \
+  && /tmp/simple-plasma-agenda-install.sh
 ```
 
-Poi: **Desktop → Aggiungi elementi grafici… → Simple Plasma Agenda**.
+Lo script viene salvato come file normale in `/tmp`: puoi quindi leggerlo prima di eseguirlo. Non viene usato il pattern `curl | bash`.
 
-### Se parti da Plasma senza PIM: installazione assistita consigliata
-
-Il repository include `scripts/install.sh`. Lo script:
+`install.sh`:
 
 - verifica che il sistema usi Plasma 6;
-- riconosce la famiglia della distribuzione e il package manager appropriato (`dnf`, `apt`, `pacman` o `zypper`);
+- riconosce automaticamente la distribuzione e usa il package manager appropriato (`dnf`, `apt`, `pacman` o `zypper`);
 - controlla Akonadi, KOrganizer, `busctl` e il plugin Plasma `pimevents`;
 - se manca qualcosa, mostra prima i pacchetti che intende installare e **chiede conferma prima di usare `sudo`**;
 - avvia Akonadi come utente, se necessario;
-- si ferma su un checkpoint manuale: devi aggiungere/autenticare almeno un calendario in KOrganizer e verificare che gli eventi siano visibili;
+- si ferma su un checkpoint manuale per farti configurare e verificare almeno un calendario;
 - solo dopo la tua conferma installa o aggiorna Simple Plasma Agenda.
 
-Dal repository estratto:
+Se lo script è eseguito dentro una copia del repository usa i file locali del plasmoide. Se invece è stato scaricato da solo, al momento dell'installazione recupera automaticamente l'asset stabile:
+
+```text
+Simple-Plasma-Agenda.plasmoid
+```
+
+dall'ultima release GitHub e lo elimina dalla directory temporanea dopo l'installazione.
+
+Dal repository estratto puoi comunque usare:
 
 ```bash
 chmod +x scripts/install.sh
@@ -101,9 +118,25 @@ Comandi aggiuntivi:
 ./scripts/install.sh --widget   # installa/aggiorna solo il plasmoide
 ```
 
-Lo script **non** configura account, password o credenziali e non sceglie i calendari al posto dell'utente.
+Lo script **non** configura account, password o credenziali e non sceglie i calendari al posto dell'utente. Se non vuoi installare KDE PIM/Akonadi, rispondi **No** alla richiesta di conferma e non verrà installato nulla.
 
-Se l'installazione delle dipendenze non ti interessa, puoi rispondere **No** alla richiesta di conferma: non verrà installato nulla.
+### Installazione diretta del plasmoide
+
+Se KDE PIM / Akonadi sono già configurati, puoi usare il normale pacchetto `.plasmoid` o, quando disponibile, **Aggiungi elementi grafici… → Scarica nuovi elementi grafici…** in Plasma.
+
+Per il pacchetto scaricato da una release:
+
+```bash
+kpackagetool6 -t Plasma/Applet -i Simple-Plasma-Agenda.plasmoid
+```
+
+L'installazione per utente finisce sotto:
+
+```text
+~/.local/share/plasma/plasmoids/com.simple.plasma.agenda/
+```
+
+Poi: **Desktop → Aggiungi elementi grafici… → Simple Plasma Agenda**.
 
 ### Installazione manuale delle dipendenze
 
@@ -150,24 +183,33 @@ akonadictl start
 
 Non avviare Akonadi come root.
 
-### Aggiungere e verificare un calendario
+### Aggiungere un calendario: esempio Google Calendar con KOrganizer
 
-Apri KOrganizer e vai in:
+KOrganizer è il percorso consigliato perché è ben documentato e perché Simple Plasma Agenda lo apre quando clicchi un evento.
+
+1. Apri **KOrganizer**.
+2. Vai in **Impostazioni → Configura KOrganizer… → Generale → Calendari → Aggiungi…**. In alternativa, nel pannello laterale **Gestore calendari**, usa il menu contestuale e scegli **Aggiungi calendario…**.
+3. Seleziona **Google Calendars and Tasks** / **Calendari e attività di Google** (il testo può variare leggermente con la lingua dell'interfaccia).
+4. Inserisci il tuo account Google quando richiesto.
+5. Completa l'accesso e l'autorizzazione nella pagina web aperta dal sistema.
+6. Torna in KOrganizer e attendi che la risorsa Google risulti pronta.
+7. Nel Gestore calendari, verifica che i calendari Google che vuoi usare siano abilitati.
+8. Controlla che almeno alcuni eventi reali siano visibili in KOrganizer.
+9. Apri il calendario dell'**Orologio digitale di Plasma** e verifica, preferibilmente, che gli stessi eventi PIM compaiano anche lì.
+
+Solo a questo punto ha senso installare o aggiungere Simple Plasma Agenda al desktop. Il plasmoide mostra ciò che Akonadi e `pimevents` gli forniscono: se gli eventi non sono visibili a monte, non può recuperarli autonomamente.
+
+Per altri servizi, nello stesso dialogo puoi scegliere per esempio una risorsa **DAV groupware** per CalDAV / Nextcloud, un file o una cartella iCalendar, oppure una sorgente locale.
+
+### Posso usare Merkuro?
+
+Sì. Merkuro usa anch'esso Akonadi e supporta calendari online come Google, Nextcloud e CalDAV. Nelle versioni attuali il percorso per aggiungere un account è normalmente:
 
 ```text
-Settings → Configure KOrganizer… → General → Calendars → Add…
+Impostazioni → Configura Merkuro → Account → Aggiungi account
 ```
 
-oppure usa **Add Calendar…** nel pannello laterale dei calendari.
-
-Configura almeno una sorgente supportata da Akonadi, per esempio Google, CalDAV / Nextcloud, iCalendar o un calendario locale, e completa l'eventuale autenticazione.
-
-Prima di aggiungere Simple Plasma Agenda al desktop, verifica che gli eventi compaiano:
-
-1. in **KOrganizer**;
-2. preferibilmente anche nel calendario dell'**Orologio digitale di Plasma**, con gli eventi PIM attivi.
-
-Se non compaiono lì, il problema è a monte del plasmoide e va risolto nella configurazione Akonadi/PIM.
+Per Simple Plasma Agenda, però, **KOrganizer resta il percorso consigliato per la prima configurazione**: è quello richiesto anche dal clic sugli eventi ed è il flusso che abbiamo usato nei test. Una risorsa Akonadi aggiunta in KOrganizer diventa normalmente disponibile anche in Merkuro, quindi puoi poi usare liberamente l'applicazione che preferisci.
 
 ### Note sul refresh Google
 
@@ -264,37 +306,54 @@ If events are not available through Akonadi and `pimevents`, Simple Plasma Agend
 
 ## Installation
 
-### If KDE PIM / Akonadi are already configured
+Before choosing an installation method, make this distinction:
 
-Use the normal `.plasmoid` package or, once available, Plasma's **Add Widgets… → Get New Widgets…** interface.
+- if your events are already visible in **KOrganizer** and in Plasma's **Digital Clock** calendar, you can install the widget directly;
+- if you do not use KDE PIM / Akonadi yet, or you are unsure whether they are configured, the **assisted installation** is recommended.
 
-For a local package:
+### Assisted installation — recommended for Plasma systems without PIM
+
+Once the repository is public, the quickest method will download and run **only** `install.sh`.
+
+With `curl`:
 
 ```bash
-kpackagetool6 -t Plasma/Applet -i com.simple.plasma.agenda-0.2.21.zip
+curl -fsSLo /tmp/simple-plasma-agenda-install.sh \
+  https://raw.githubusercontent.com/Omar-Ceretta/simple-plasma-agenda/main/scripts/install.sh \
+  && chmod +x /tmp/simple-plasma-agenda-install.sh \
+  && /tmp/simple-plasma-agenda-install.sh
 ```
 
-Per-user installation lives under:
+Or with `wget`:
 
-```text
-~/.local/share/plasma/plasmoids/com.simple.plasma.agenda/
+```bash
+wget -qO /tmp/simple-plasma-agenda-install.sh \
+  https://raw.githubusercontent.com/Omar-Ceretta/simple-plasma-agenda/main/scripts/install.sh \
+  && chmod +x /tmp/simple-plasma-agenda-install.sh \
+  && /tmp/simple-plasma-agenda-install.sh
 ```
 
-Then use: **Desktop → Add Widgets… → Simple Plasma Agenda**.
+The script is saved as a normal file under `/tmp`, so you can inspect it before running it. The project does not use the `curl | bash` pattern.
 
-### Starting from Plasma without PIM: assisted installation recommended
-
-The repository includes `scripts/install.sh`. The script:
+`install.sh`:
 
 - checks that the system is running Plasma 6;
-- detects the distribution family and the appropriate package manager (`dnf`, `apt`, `pacman` or `zypper`);
+- automatically detects the distribution and uses the appropriate package manager (`dnf`, `apt`, `pacman` or `zypper`);
 - checks Akonadi, KOrganizer, `busctl` and Plasma's `pimevents` plugin;
 - if something is missing, shows the packages it intends to install and **asks before using `sudo`**;
 - starts Akonadi as the current user when needed;
-- stops at a manual checkpoint: you must add/authenticate at least one calendar in KOrganizer and verify that events are visible;
+- stops at a manual checkpoint so you can configure and verify at least one calendar;
 - only after your confirmation installs or updates Simple Plasma Agenda.
 
-From the extracted repository:
+When the script is run inside a repository checkout, it uses the local widget files. When it is downloaded standalone, it fetches the stable release asset:
+
+```text
+Simple-Plasma-Agenda.plasmoid
+```
+
+from the latest GitHub release and removes the temporary download after installation.
+
+From an extracted repository you can still use:
 
 ```bash
 chmod +x scripts/install.sh
@@ -309,9 +368,25 @@ Additional modes:
 ./scripts/install.sh --widget   # install/update the widget only
 ```
 
-The script does **not** configure accounts, passwords or credentials, and it does not choose calendar sources for the user.
+The script does **not** configure accounts, passwords or credentials, and it does not choose calendar sources for you. If you do not want KDE PIM/Akonadi installed, answer **No** at the confirmation prompt and nothing will be installed.
 
-If you do not want the extra KDE PIM packages, answer **No** at the confirmation prompt: nothing will be installed.
+### Direct widget installation
+
+If KDE PIM / Akonadi are already configured, use the normal `.plasmoid` package or, once available, Plasma's **Add Widgets… → Get New Widgets…** interface.
+
+For a package downloaded from a release:
+
+```bash
+kpackagetool6 -t Plasma/Applet -i Simple-Plasma-Agenda.plasmoid
+```
+
+Per-user installation lives under:
+
+```text
+~/.local/share/plasma/plasmoids/com.simple.plasma.agenda/
+```
+
+Then use: **Desktop → Add Widgets… → Simple Plasma Agenda**.
 
 ### Manual dependency installation
 
@@ -358,24 +433,33 @@ akonadictl start
 
 Do not run Akonadi as root.
 
-### Add and verify a calendar
+### Add a calendar: Google Calendar example with KOrganizer
 
-Open KOrganizer and go to:
+KOrganizer is the recommended path because it is well documented and because Simple Plasma Agenda opens it when you click an event.
+
+1. Open **KOrganizer**.
+2. Go to **Settings → Configure KOrganizer… → General → Calendars → Add…**. Alternatively, use **Add Calendar…** from the context menu in the **Calendar Manager** sidebar.
+3. Select **Google Calendars and Tasks**.
+4. Enter your Google account when requested.
+5. Complete sign-in and authorization in the web page opened by the system.
+6. Return to KOrganizer and wait until the Google resource is ready.
+7. In Calendar Manager, make sure the Google calendars you want to use are enabled.
+8. Verify that some real events are visible in KOrganizer.
+9. Preferably open Plasma's **Digital Clock** calendar as well and verify that the same PIM events appear there.
+
+Only at this point does it make sense to install or add Simple Plasma Agenda to the desktop. The widget displays what Akonadi and `pimevents` provide; if events are not visible upstream, the widget cannot fetch them independently.
+
+For other services, the same dialog can add a **DAV groupware** resource for CalDAV / Nextcloud, an iCalendar file or folder, or a local source.
+
+### Can I use Merkuro?
+
+Yes. Merkuro also uses Akonadi and supports online calendars including Google, Nextcloud and CalDAV. In current versions, the account path is normally:
 
 ```text
-Settings → Configure KOrganizer… → General → Calendars → Add…
+Settings → Configure Merkuro → Accounts → Add Account
 ```
 
-or use **Add Calendar…** in KOrganizer's calendar sidebar.
-
-Configure at least one Akonadi-supported source, such as Google, CalDAV / Nextcloud, iCalendar or a local calendar, and complete any required authentication.
-
-Before adding Simple Plasma Agenda to the desktop, make sure events appear:
-
-1. in **KOrganizer**;
-2. preferably also in Plasma's **Digital Clock** calendar with PIM events enabled.
-
-If they do not appear there, the issue is upstream of the widget and should be solved in the Akonadi/PIM setup first.
+For Simple Plasma Agenda, however, **KOrganizer remains the recommended first-setup path**: it is also required for the widget's event-click action and it is the workflow used in our tests. An Akonadi resource added in KOrganizer normally becomes available in Merkuro as well, so you can then use whichever calendar application you prefer.
 
 ### Google refresh notes
 

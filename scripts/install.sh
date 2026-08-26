@@ -2,6 +2,10 @@
 set -euo pipefail
 
 APP_ID="com.simple.plasma.agenda"
+REPO_SLUG="Omar-Ceretta/simple-plasma-agenda"
+DEFAULT_WIDGET_URL="https://github.com/${REPO_SLUG}/releases/latest/download/Simple-Plasma-Agenda.plasmoid"
+WIDGET_URL="${SPA_PLASMOID_URL:-$DEFAULT_WIDGET_URL}"
+
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 
@@ -20,14 +24,18 @@ Usage:
   ./scripts/install.sh --widget
   ./scripts/install.sh --help
 
+The same script can also be downloaded and run standalone.
+
 Modes:
   (default)  Check the system, offer to install missing KDE PIM/Akonadi
-             dependencies, start Akonadi, then install/update the widget.
+             dependencies, start Akonadi, stop for calendar setup, then
+             install/update the widget.
   --check    Read-only preflight report.
   --deps     Check and, if needed, offer to install KDE PIM/Akonadi only.
-  --widget   Install/update only the widget from this repository checkout.
+  --widget   Install/update only the widget. From a repository checkout it
+             uses local files; standalone it downloads the latest release asset.
 
-The script never configures calendar accounts or credentials.
+The script never configures calendar accounts, passwords or credentials.
 USAGE
 }
 
@@ -285,28 +293,53 @@ find_package_dir() {
 }
 
 stage_package() {
-    local source_dir="$1" stage_root="$2" staged="$stage_root/$APP_ID"
+    local source_dir="$1" stage_root="$2" staged
+    staged="$stage_root/$APP_ID"
     mkdir -p "$staged"
     cp -a "$source_dir/metadata.json" "$staged/"
     cp -a "$source_dir/contents" "$staged/"
+    [[ -f "$source_dir/LICENSE" ]] && cp -a "$source_dir/LICENSE" "$staged/"
+    [[ -f "$source_dir/NOTICE.md" ]] && cp -a "$source_dir/NOTICE.md" "$staged/"
     printf '%s\n' "$staged"
+}
+
+download_file() {
+    local url="$1" output="$2"
+
+    if command -v curl >/dev/null 2>&1; then
+        curl -fL --retry 2 --connect-timeout 15 -o "$output" "$url"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -O "$output" "$url"
+    else
+        die "Neither curl nor wget is available. Install one of them or run the installer from a repository checkout."
+    fi
+
+    [[ -s "$output" ]] || die "Downloaded package is empty."
 }
 
 install_widget() {
     check_plasma
 
-    local source_dir tmp staged
-    source_dir="$(find_package_dir "$REPO_ROOT")" || die "Repository checkout does not contain metadata.json + contents/."
+    local source_dir="" tmp package_path=""
     tmp="$(mktemp -d)"
     trap 'rm -rf "$tmp"' RETURN
-    staged="$(stage_package "$source_dir" "$tmp")"
+
+    if source_dir="$(find_package_dir "$REPO_ROOT" 2>/dev/null)"; then
+        log "Using widget files from the local repository checkout"
+        package_path="$(stage_package "$source_dir" "$tmp")"
+    else
+        package_path="$tmp/Simple-Plasma-Agenda.plasmoid"
+        log "Downloading the latest Simple Plasma Agenda release"
+        printf 'Source: %s\n' "$WIDGET_URL"
+        download_file "$WIDGET_URL" "$package_path"
+    fi
 
     if plasmoid_installed; then
         log "Updating Simple Plasma Agenda"
-        kpackagetool6 -t Plasma/Applet -u "$staged" || die "Widget update failed. The existing installation was left in place."
+        kpackagetool6 -t Plasma/Applet -u "$package_path" || die "Widget update failed. The existing installation was left in place."
     else
         log "Installing Simple Plasma Agenda"
-        kpackagetool6 -t Plasma/Applet -i "$staged"
+        kpackagetool6 -t Plasma/Applet -i "$package_path"
     fi
 
     rm -rf "$tmp"
@@ -318,15 +351,33 @@ calendar_checkpoint() {
 
 System prerequisites are ready.
 
-Before installing the widget:
-  1. Open KOrganizer.
-  2. Add/authenticate at least one calendar resource
-     (Google, CalDAV/Nextcloud, iCalendar, local calendar, ...).
-  3. Verify that events are visible in KOrganizer and, preferably,
-     in Plasma's Digital Clock calendar.
+Now configure at least one calendar before installing the widget.
+KOrganizer is recommended because Simple Plasma Agenda also opens KOrganizer
+when you click an event.
 
-This checkpoint is intentionally manual: the installer does not handle
-accounts, passwords or calendar-source selection.
+Example: Google Calendar in KOrganizer
+  1. Open KOrganizer.
+  2. Settings -> Configure KOrganizer... -> General -> Calendars -> Add...
+     (or right-click the Calendar Manager sidebar -> Add Calendar...).
+  3. Choose "Google Calendars and Tasks".
+  4. Enter your Google account when requested.
+  5. Complete the Google sign-in/authorization in the browser.
+  6. Return to KOrganizer and wait until the Google resource is ready.
+  7. Make sure the calendars you want are enabled in Calendar Manager.
+  8. Verify that real events are visible in KOrganizer.
+  9. Preferably also open Plasma's Digital Clock calendar and verify that
+     the same PIM events are visible there.
+
+Merkuro can use the same Akonadi resources. If you prefer it, the account page
+is normally under Settings -> Configure Merkuro -> Accounts -> Add Account.
+For the most predictable setup path, add the resource in KOrganizer first;
+it should then also become available in Merkuro.
+
+Other supported Akonadi resources include DAV/CalDAV (for example Nextcloud),
+iCalendar files/folders and local calendars.
+
+This checkpoint is intentionally manual: the installer never handles your
+account password, OAuth choices, credentials or calendar-source selection.
 CHECKPOINT
 }
 
@@ -351,7 +402,7 @@ full_install() {
     calendar_checkpoint
 
     if ! confirm "Are calendar events visible and should Simple Plasma Agenda be installed now?"; then
-        printf '\nWidget installation skipped. When ready, run:\n  ./scripts/install.sh --widget\n'
+        printf '\nWidget installation skipped. When ready, run this installer again with --widget.\n'
         return 0
     fi
 
