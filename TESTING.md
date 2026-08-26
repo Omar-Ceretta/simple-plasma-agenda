@@ -38,14 +38,14 @@ Nel corso dei test sono stati verificati, a seconda dell'ambiente:
 
 ## Limiti intenzionali da tenere presenti nei test
 
-- La selezione delle sorgenti calendario **non** appartiene al plasmoide: resta ad Akonadi/KOrganizer.
+- La selezione delle sorgenti calendario **non** appartiene al pannello del plasmoide: account e risorse restano ad Akonadi/KOrganizer; l'installer può inizializzare la lista globale di `pimevents`.
 - Il clic apre il **giorno** in KOrganizer, non il singolo editor dell'evento.
 - Il refresh forzato riguarda soltanto `akonadi_google_resource_*`.
-- Se KOrganizer e il calendario Plasma non vedono gli eventi, il problema va risolto prima nel livello Akonadi/PIM.
+- Se KOrganizer non vede gli eventi, il problema va risolto prima nel livello Akonadi/PIM. Se KOrganizer li vede ma SPA no, va verificata la selezione globale di `pimevents`.
 
 ## Validazione installer assistito
 
-`scripts/install.sh` è stato aggiunto dopo i test distro sopra elencati. Il suo test completo da una VM senza KDE PIM/Akonadi è **ancora da eseguire** e non viene conteggiato come PASS in questo file. La modalità standalone con download dell'asset `.plasmoid` sarà verificata separatamente; prima della pubblicazione può essere provata con un URL di test tramite la variabile `SPA_PLASMOID_URL`.
+`scripts/install.sh` è stato aggiunto dopo i test distro sopra elencati. Su una Fedora KDE 44 fresca sono stati verificati il download pubblico dello script, il rilevamento delle dipendenze già presenti e il download/installazione dell'asset `.plasmoid` dalla GitHub Release. Il test completo da una VM realmente priva di KDE PIM/Akonadi è **ancora da eseguire**. Il nuovo selettore grafico temporaneo delle collection Akonadi deve ancora essere validato end-to-end prima di considerare concluso il test dell'installer.
 
 ## Preflight minimo
 
@@ -97,14 +97,14 @@ Across the tested environments, the following were verified as applicable:
 
 ## Intentional limitations relevant to testing
 
-- Calendar-source selection does **not** belong to the widget; it stays in Akonadi/KOrganizer.
+- Calendar-source selection does **not** belong to the widget settings: accounts/resources stay in Akonadi/KOrganizer, while the installer may initialize the global `pimevents` list.
 - Clicking opens the event's **day** in KOrganizer, not the individual event editor.
 - Forced refresh is limited to `akonadi_google_resource_*`.
-- If KOrganizer and Plasma's calendar cannot see the events, solve the Akonadi/PIM layer first.
+- If KOrganizer cannot see the events, solve the Akonadi/PIM layer first. If KOrganizer can see them but SPA cannot, check the global `pimevents` selection.
 
 ## Assisted-installer validation
 
-`scripts/install.sh` was added after the distribution tests listed above. A full test starting from a VM without KDE PIM/Akonadi is **still pending** and is not counted as a PASS in this file. Standalone mode with `.plasmoid` asset download will be verified separately; before publication it can be tested against a temporary URL through the `SPA_PLASMOID_URL` environment variable.
+`scripts/install.sh` was added after the distribution tests listed above. On a fresh Fedora KDE 44 system, the public script download, detection of already-present dependencies, and download/installation of the `.plasmoid` asset from the GitHub Release were verified. A full test starting from a VM truly without KDE PIM/Akonadi is **still pending**. The new temporary graphical Akonadi collection selector still needs end-to-end validation before installer testing is considered complete.
 
 ## Minimal preflight
 

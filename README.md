@@ -36,7 +36,7 @@ Simple Plasma Agenda **non**:
 - seleziona o deseleziona calendari dal proprio pannello di configurazione;
 - apre direttamente l'editor del singolo evento.
 
-La scelta delle sorgenti resta ad **Akonadi / KOrganizer**. Il plasmoide mostra ciò che il plugin Plasma `pimevents` rende disponibile.
+Account e sorgenti restano gestiti da **Akonadi / KOrganizer**. Simple Plasma Agenda non contiene un selettore di calendari: l'installer assistito può inizializzare, una tantum, quali collection Akonadi il backend Plasma `pimevents` deve esporre al plasmoide.
 
 ### Come arrivano gli eventi
 
@@ -56,14 +56,14 @@ Se gli eventi non sono visibili in Akonadi e in `pimevents`, Simple Plasma Agend
 
 ## Installazione
 
-Prima di scegliere il metodo di installazione, fai questa distinzione:
+Prima di scegliere il metodo di installazione:
 
-- se i tuoi eventi sono già visibili in **KOrganizer** e nel calendario dell'**Orologio digitale di Plasma**, puoi installare direttamente il plasmoide;
-- se non usi ancora KDE PIM / Akonadi, oppure non sai se siano configurati, è consigliata l'**installazione assistita**.
+- se KDE PIM/Akonadi è già configurato **e `pimevents` ha già una selezione di calendari**, puoi installare direttamente il plasmoide;
+- se parti da Plasma senza PIM, oppure gli eventi sono visibili in KOrganizer ma non sai se `pimevents` sia configurato, usa l'**installazione assistita**.
 
-### Installazione assistita — consigliata se parti da Plasma senza PIM
+### Installazione assistita — consigliata
 
-Quando il repository sarà pubblico, il modo più rapido sarà scaricare ed eseguire **solo** `install.sh`.
+Il modo più rapido è scaricare ed eseguire **solo** `install.sh`.
 
 Con `curl`:
 
@@ -83,27 +83,25 @@ wget -qO /tmp/simple-plasma-agenda-install.sh \
   && /tmp/simple-plasma-agenda-install.sh
 ```
 
-Lo script viene salvato come file normale in `/tmp`: puoi quindi leggerlo prima di eseguirlo. Non viene usato il pattern `curl | bash`.
+Lo script viene salvato come file normale in `/tmp`, quindi puoi leggerlo prima di eseguirlo. Non viene usato il pattern `curl | bash`.
 
 `install.sh`:
 
-- verifica che il sistema usi Plasma 6;
-- riconosce automaticamente la distribuzione e usa il package manager appropriato (`dnf`, `apt`, `pacman` o `zypper`);
-- controlla Akonadi, KOrganizer, `busctl` e il plugin Plasma `pimevents`;
-- se manca qualcosa, mostra prima i pacchetti che intende installare e **chiede conferma prima di usare `sudo`**;
+- verifica Plasma 6;
+- rileva automaticamente `dnf`, `apt`, `pacman` o `zypper`;
+- controlla Akonadi, KOrganizer, `busctl` e `pimevents`;
+- se manca qualcosa, mostra i pacchetti e **chiede conferma prima di usare `sudo`**;
 - avvia Akonadi come utente, se necessario;
-- si ferma su un checkpoint manuale per farti configurare e verificare almeno un calendario;
-- solo dopo la tua conferma installa o aggiorna Simple Plasma Agenda.
+- si ferma per permetterti di aggiungere e verificare almeno un calendario in KOrganizer;
+- apre poi un piccolo **selettore temporaneo dei calendari Akonadi**: scegli solo quelli che vuoi mostrare in Simple Plasma Agenda;
+- registra quella scelta nella normale configurazione globale di `pimevents`, senza usare `PimCalendarsModel::saveConfig()` e senza interrogare direttamente il database Akonadi;
+- elimina il selettore temporaneo e installa/aggiorna il plasmoide.
 
-Se lo script è eseguito dentro una copia del repository usa i file locali del plasmoide. Se invece è stato scaricato da solo, al momento dell'installazione recupera automaticamente l'asset stabile:
+Il selettore serve solo durante la configurazione. **Non è necessario abilitare gli eventi PIM nell'Orologio digitale di Plasma.**
 
-```text
-Simple-Plasma-Agenda.plasmoid
-```
+Se lo script è eseguito dentro una copia del repository usa i file locali. Se è stato scaricato da solo, recupera automaticamente `Simple-Plasma-Agenda.plasmoid` dall'ultima release GitHub e cancella il download temporaneo dopo l'installazione.
 
-dall'ultima release GitHub e lo elimina dalla directory temporanea dopo l'installazione.
-
-Dal repository estratto puoi comunque usare:
+Dal repository:
 
 ```bash
 chmod +x scripts/install.sh
@@ -113,18 +111,17 @@ chmod +x scripts/install.sh
 Comandi aggiuntivi:
 
 ```bash
-./scripts/install.sh --check    # solo controlli, nessuna modifica
-./scripts/install.sh --deps     # prepara solo KDE PIM / Akonadi
-./scripts/install.sh --widget   # installa/aggiorna solo il plasmoide
+./scripts/install.sh --check       # solo controlli
+./scripts/install.sh --deps        # prepara solo KDE PIM / Akonadi
+./scripts/install.sh --calendars   # cambia i calendari mostrati da SPA
+./scripts/install.sh --widget      # installa/aggiorna solo il plasmoide
 ```
 
-Lo script **non** configura account, password o credenziali e non sceglie i calendari al posto dell'utente. Se non vuoi installare KDE PIM/Akonadi, rispondi **No** alla richiesta di conferma e non verrà installato nulla.
+Lo script **non** configura account, password, OAuth o credenziali. La scelta dei calendari avviene localmente leggendo solo i nomi e gli ID delle collection Akonadi già configurate. Se non vuoi installare KDE PIM/Akonadi, rispondi **No** alla richiesta di conferma.
 
 ### Installazione diretta del plasmoide
 
-Se KDE PIM / Akonadi sono già configurati, puoi usare il normale pacchetto `.plasmoid` o, quando disponibile, **Aggiungi elementi grafici… → Scarica nuovi elementi grafici…** in Plasma.
-
-Per il pacchetto scaricato da una release:
+Se KDE PIM/Akonadi e `pimevents` sono già configurati, puoi usare il normale pacchetto `.plasmoid` o **Aggiungi elementi grafici… → Scarica nuovi elementi grafici…** in Plasma.
 
 ```bash
 kpackagetool6 -t Plasma/Applet -i Simple-Plasma-Agenda.plasmoid
@@ -137,6 +134,18 @@ L'installazione per utente finisce sotto:
 ```
 
 Poi: **Desktop → Aggiungi elementi grafici… → Simple Plasma Agenda**.
+
+Se gli eventi sono visibili in KOrganizer ma SPA resta vuota, inizializza o modifica la selezione di `pimevents` con:
+
+```bash
+/tmp/simple-plasma-agenda-install.sh --calendars
+```
+
+oppure, da un checkout del repository:
+
+```bash
+./scripts/install.sh --calendars
+```
 
 ### Installazione manuale delle dipendenze
 
@@ -185,21 +194,20 @@ Non avviare Akonadi come root.
 
 ### Aggiungere un calendario: esempio Google Calendar con KOrganizer
 
-KOrganizer è il percorso consigliato perché è ben documentato e perché Simple Plasma Agenda lo apre quando clicchi un evento.
+KOrganizer è il percorso consigliato perché Simple Plasma Agenda lo usa anche quando clicchi un evento.
 
 1. Apri **KOrganizer**.
-2. Vai in **Impostazioni → Configura KOrganizer… → Generale → Calendari → Aggiungi…**. In alternativa, nel pannello laterale **Gestore calendari**, usa il menu contestuale e scegli **Aggiungi calendario…**.
-3. Seleziona **Google Calendars and Tasks** / **Calendari e attività di Google** (il testo può variare leggermente con la lingua dell'interfaccia).
-4. Inserisci il tuo account Google quando richiesto.
-5. Completa l'accesso e l'autorizzazione nella pagina web aperta dal sistema.
-6. Torna in KOrganizer e attendi che la risorsa Google risulti pronta.
-7. Nel Gestore calendari, verifica che i calendari Google che vuoi usare siano abilitati.
-8. Controlla che almeno alcuni eventi reali siano visibili in KOrganizer.
-9. Apri il calendario dell'**Orologio digitale di Plasma** e verifica, preferibilmente, che gli stessi eventi PIM compaiano anche lì.
+2. Vai in **Impostazioni → Configura KOrganizer… → Generale → Calendari → Aggiungi…**.
+3. Scegli **Google Groupware**.
+4. Seleziona la nuova risorsa Google Groupware e premi **Configura**.
+5. Completa accesso e autorizzazione Google nella pagina web aperta dal sistema.
+6. Torna in KOrganizer e premi **Applica / OK**.
+7. Attendi che la risorsa risulti pronta e verifica che gli eventi reali siano visibili in KOrganizer.
+8. Se stai usando `install.sh`, torna al terminale e conferma il checkpoint: comparirà il selettore grafico con le collection Akonadi disponibili. Seleziona **solo** i calendari che vuoi vedere in Simple Plasma Agenda.
 
-Solo a questo punto ha senso installare o aggiungere Simple Plasma Agenda al desktop. Il plasmoide mostra ciò che Akonadi e `pimevents` gli forniscono: se gli eventi non sono visibili a monte, non può recuperarli autonomamente.
+Non serve attivare PIM Events nell'Orologio digitale. Il selettore dell'installer inizializza direttamente la lista globale usata da `pimevents`.
 
-Per altri servizi, nello stesso dialogo puoi scegliere per esempio una risorsa **DAV groupware** per CalDAV / Nextcloud, un file o una cartella iCalendar, oppure una sorgente locale.
+Per altri servizi puoi aggiungere, nello stesso dialogo, una risorsa **DAV groupware** per CalDAV / Nextcloud, un file o una cartella iCalendar oppure una sorgente locale.
 
 ### Posso usare Merkuro?
 
@@ -286,7 +294,7 @@ Simple Plasma Agenda does **not**:
 - enable or disable calendars from its own settings;
 - open the individual event editor directly.
 
-Calendar-source selection stays in **Akonadi / KOrganizer**. The widget displays what Plasma's `pimevents` plugin exposes.
+Accounts and calendar resources remain managed by **Akonadi / KOrganizer**. Simple Plasma Agenda has no calendar selector of its own: the assisted installer can initialize, once, which Akonadi collections Plasma's `pimevents` backend should expose to the widget.
 
 ### How events reach the widget
 
@@ -306,14 +314,14 @@ If events are not available through Akonadi and `pimevents`, Simple Plasma Agend
 
 ## Installation
 
-Before choosing an installation method, make this distinction:
+Before choosing an installation method:
 
-- if your events are already visible in **KOrganizer** and in Plasma's **Digital Clock** calendar, you can install the widget directly;
-- if you do not use KDE PIM / Akonadi yet, or you are unsure whether they are configured, the **assisted installation** is recommended.
+- if KDE PIM/Akonadi is already configured **and `pimevents` already has a calendar selection**, you can install the widget directly;
+- if you start from Plasma without PIM, or events are visible in KOrganizer but you are unsure whether `pimevents` is configured, use the **assisted installation**.
 
-### Assisted installation — recommended for Plasma systems without PIM
+### Assisted installation — recommended
 
-Once the repository is public, the quickest method will download and run **only** `install.sh`.
+The quickest method downloads and runs **only** `install.sh`.
 
 With `curl`:
 
@@ -337,23 +345,21 @@ The script is saved as a normal file under `/tmp`, so you can inspect it before 
 
 `install.sh`:
 
-- checks that the system is running Plasma 6;
-- automatically detects the distribution and uses the appropriate package manager (`dnf`, `apt`, `pacman` or `zypper`);
-- checks Akonadi, KOrganizer, `busctl` and Plasma's `pimevents` plugin;
-- if something is missing, shows the packages it intends to install and **asks before using `sudo`**;
+- checks Plasma 6;
+- automatically detects `dnf`, `apt`, `pacman` or `zypper`;
+- checks Akonadi, KOrganizer, `busctl` and `pimevents`;
+- if something is missing, shows the packages and **asks before using `sudo`**;
 - starts Akonadi as the current user when needed;
-- stops at a manual checkpoint so you can configure and verify at least one calendar;
-- only after your confirmation installs or updates Simple Plasma Agenda.
+- pauses so you can add and verify at least one calendar in KOrganizer;
+- then opens a small **temporary Akonadi calendar selector**: choose only the calendars you want Simple Plasma Agenda to display;
+- stores that choice in the normal global `pimevents` configuration, without using `PimCalendarsModel::saveConfig()` and without querying the Akonadi database directly;
+- removes the temporary selector and installs/updates the widget.
 
-When the script is run inside a repository checkout, it uses the local widget files. When it is downloaded standalone, it fetches the stable release asset:
+The selector is only a setup tool. **PIM events do not need to be enabled in Plasma's Digital Clock.**
 
-```text
-Simple-Plasma-Agenda.plasmoid
-```
+When run inside a repository checkout, the script uses local widget files. When downloaded standalone, it fetches `Simple-Plasma-Agenda.plasmoid` from the latest GitHub release and removes the temporary download after installation.
 
-from the latest GitHub release and removes the temporary download after installation.
-
-From an extracted repository you can still use:
+From the repository:
 
 ```bash
 chmod +x scripts/install.sh
@@ -363,18 +369,17 @@ chmod +x scripts/install.sh
 Additional modes:
 
 ```bash
-./scripts/install.sh --check    # checks only, no changes
-./scripts/install.sh --deps     # prepare KDE PIM / Akonadi only
-./scripts/install.sh --widget   # install/update the widget only
+./scripts/install.sh --check       # checks only
+./scripts/install.sh --deps        # prepare KDE PIM / Akonadi only
+./scripts/install.sh --calendars   # change the calendars shown by SPA
+./scripts/install.sh --widget      # install/update the widget only
 ```
 
-The script does **not** configure accounts, passwords or credentials, and it does not choose calendar sources for you. If you do not want KDE PIM/Akonadi installed, answer **No** at the confirmation prompt and nothing will be installed.
+The script does **not** configure accounts, passwords, OAuth or credentials. Calendar selection is local and reads only names and IDs of already configured Akonadi collections. If you do not want KDE PIM/Akonadi installed, answer **No** at the confirmation prompt.
 
 ### Direct widget installation
 
-If KDE PIM / Akonadi are already configured, use the normal `.plasmoid` package or, once available, Plasma's **Add Widgets… → Get New Widgets…** interface.
-
-For a package downloaded from a release:
+If KDE PIM/Akonadi and `pimevents` are already configured, use the normal `.plasmoid` package or Plasma's **Add Widgets… → Get New Widgets…** interface.
 
 ```bash
 kpackagetool6 -t Plasma/Applet -i Simple-Plasma-Agenda.plasmoid
@@ -387,6 +392,18 @@ Per-user installation lives under:
 ```
 
 Then use: **Desktop → Add Widgets… → Simple Plasma Agenda**.
+
+If events are visible in KOrganizer but SPA remains empty, initialize or change the `pimevents` selection with:
+
+```bash
+/tmp/simple-plasma-agenda-install.sh --calendars
+```
+
+or, from a repository checkout:
+
+```bash
+./scripts/install.sh --calendars
+```
 
 ### Manual dependency installation
 
@@ -435,19 +452,18 @@ Do not run Akonadi as root.
 
 ### Add a calendar: Google Calendar example with KOrganizer
 
-KOrganizer is the recommended path because it is well documented and because Simple Plasma Agenda opens it when you click an event.
+KOrganizer is the recommended path because Simple Plasma Agenda also uses it when you click an event.
 
 1. Open **KOrganizer**.
-2. Go to **Settings → Configure KOrganizer… → General → Calendars → Add…**. Alternatively, use **Add Calendar…** from the context menu in the **Calendar Manager** sidebar.
-3. Select **Google Calendars and Tasks**.
-4. Enter your Google account when requested.
-5. Complete sign-in and authorization in the web page opened by the system.
-6. Return to KOrganizer and wait until the Google resource is ready.
-7. In Calendar Manager, make sure the Google calendars you want to use are enabled.
-8. Verify that some real events are visible in KOrganizer.
-9. Preferably open Plasma's **Digital Clock** calendar as well and verify that the same PIM events appear there.
+2. Go to **Settings → Configure KOrganizer… → General → Calendars → Add…**.
+3. Choose **Google Groupware**.
+4. Select the new Google Groupware resource and click **Configure**.
+5. Complete Google sign-in and authorization in the web page opened by the system.
+6. Return to KOrganizer and click **Apply / OK**.
+7. Wait until the resource is ready and verify that real events are visible in KOrganizer.
+8. If you are using `install.sh`, return to the terminal and confirm the checkpoint: the graphical selector will list the available Akonadi collections. Select **only** the calendars you want Simple Plasma Agenda to display.
 
-Only at this point does it make sense to install or add Simple Plasma Agenda to the desktop. The widget displays what Akonadi and `pimevents` provide; if events are not visible upstream, the widget cannot fetch them independently.
+You do not need to enable PIM Events in the Digital Clock. The installer selector initializes the global list used by `pimevents` directly.
 
 For other services, the same dialog can add a **DAV groupware** resource for CalDAV / Nextcloud, an iCalendar file or folder, or a local source.
 

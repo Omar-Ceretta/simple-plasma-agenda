@@ -22,6 +22,7 @@ Usage:
   ./scripts/install.sh --check
   ./scripts/install.sh --deps
   ./scripts/install.sh --widget
+  ./scripts/install.sh --calendars
   ./scripts/install.sh --help
 
 The same script can also be downloaded and run standalone.
@@ -32,10 +33,13 @@ Modes:
              install/update the widget.
   --check    Read-only preflight report.
   --deps     Check and, if needed, offer to install KDE PIM/Akonadi only.
-  --widget   Install/update only the widget. From a repository checkout it
-             uses local files; standalone it downloads the latest release asset.
+  --widget     Install/update only the widget. From a repository checkout it
+               uses local files; standalone it downloads the latest release asset.
+  --calendars  Open the temporary Akonadi calendar selector and update the global
+               pimevents calendar list used by Simple Plasma Agenda.
 
 The script never configures calendar accounts, passwords or credentials.
+Calendar selection is performed locally from Akonadi collection metadata only.
 USAGE
 }
 
@@ -109,6 +113,40 @@ find_pimevents() {
     done | head -n 1
 }
 
+pimevents_calendar_selection() {
+    command -v kreadconfig6 >/dev/null 2>&1 || return 0
+    kreadconfig6 --file plasmashellrc --group PIMEventsPlugin --key calendars 2>/dev/null || true
+}
+
+detect_pim_calendars_qml_module() {
+    local root qt_root
+    local -a roots=(
+        /usr/lib64/qt6/qml
+        /usr/lib/qt6/qml
+        /usr/lib/x86_64-linux-gnu/qt6/qml
+        /usr/lib/aarch64-linux-gnu/qt6/qml
+    )
+
+    if command -v qtpaths6 >/dev/null 2>&1; then
+        qt_root="$(qtpaths6 --query QT_INSTALL_QML 2>/dev/null || true)"
+        [[ -n "$qt_root" ]] && roots=("$qt_root" "${roots[@]}")
+    fi
+
+    for root in "${roots[@]}"; do
+        [[ -d "$root" ]] || continue
+        if [[ -f "$root/org/kde/plasma/PimCalendars/qmldir" ]]; then
+            printf '%s\n' 'org.kde.plasma.PimCalendars'
+            return 0
+        fi
+        if [[ -f "$root/org/kde/CalendarEventsPlugin/qmldir" ]]; then
+            printf '%s\n' 'org.kde.CalendarEventsPlugin'
+            return 0
+        fi
+    done
+
+    return 1
+}
+
 plasmoid_installed() {
     command -v kpackagetool6 >/dev/null 2>&1 && \
         kpackagetool6 -t Plasma/Applet -s "$APP_ID" >/dev/null 2>&1
@@ -158,9 +196,11 @@ check_system() {
         printf '%-24s %s\n' "Akonadi Server:" "MISSING"
     fi
 
-    local pimevents
+    local pimevents pim_selection
     pimevents="$(find_pimevents)"
     printf '%-24s %s\n' "pimevents:" "${pimevents:-NOT FOUND}"
+    pim_selection="$(pimevents_calendar_selection)"
+    printf '%-24s %s\n' "PIM calendars:" "${pim_selection:-not configured}"
 
     if plasmoid_installed; then
         printf '%-24s %s\n' "Simple Agenda:" "installed"
@@ -276,6 +316,311 @@ start_akonadi() {
     akonadictl start >/dev/null 2>&1 || warn "Akonadi did not start immediately; you can start it later with: akonadictl start"
 }
 
+manual_pimevents_fallback() {
+    cat <<'FALLBACK'
+
+The automatic calendar selector could not be started on this system.
+
+Fallback using Plasma's Digital Clock:
+  1. Open Digital Clock settings -> Calendar.
+  2. Temporarily enable PIM Events.
+  3. Select only the calendars you want Simple Plasma Agenda to display.
+  4. Apply the settings.
+  5. You may then disable PIM Events in the Digital Clock again.
+
+The selection remains stored globally for pimevents and Simple Plasma Agenda
+can continue to use it without displaying PIM events in the clock.
+FALLBACK
+}
+
+run_calendar_selector() {
+    command -v plasmawindowed >/dev/null 2>&1 || return 10
+    command -v kreadconfig6 >/dev/null 2>&1 || return 10
+    command -v kwriteconfig6 >/dev/null 2>&1 || return 10
+
+    local qml_module
+    qml_module="$(detect_pim_calendars_qml_module)" || return 10
+
+    local probe_id="com.simple.plasma.agenda.calendarprobe"
+    local probe_dir="$HOME/.local/share/plasma/plasmoids/$probe_id"
+    local tmp selection_file helper_file log_file initial_csv initial_js
+    tmp="$(mktemp -d)"
+    selection_file="$tmp/selection"
+    helper_file="$tmp/save-selection.sh"
+    log_file="$tmp/plasmawindowed.log"
+    initial_csv="$(pimevents_calendar_selection)"
+    initial_js=""
+
+    if [[ -n "$initial_csv" ]]; then
+        if [[ "$initial_csv" =~ ^[0-9]+(,[0-9]+)*$ ]]; then
+            initial_js="$initial_csv"
+        else
+            warn "Ignoring an unexpected existing PIM Events calendar value: $initial_csv"
+        fi
+    fi
+
+    rm -rf "$probe_dir"
+    mkdir -p "$probe_dir/contents/ui"
+
+    cat > "$probe_dir/metadata.json" <<'EOF'
+{
+    "KPlugin": {
+        "Id": "com.simple.plasma.agenda.calendarprobe",
+        "Name": "Simple Agenda Calendar Selector",
+        "Version": "1.0"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
+EOF
+
+    cat > "$helper_file" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+value="\${1:-}"
+if [[ "\$value" == "CANCEL" ]]; then
+    printf '%s\n' CANCEL > '$selection_file'
+    exit 0
+fi
+[[ "\$value" =~ ^[0-9]+(,[0-9]+)*\$ ]] || exit 2
+printf '%s\n' "\$value" > '$selection_file'
+EOF
+    chmod +x "$helper_file"
+
+    cat > "$probe_dir/contents/ui/main.qml" <<EOF
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC2
+import org.kde.plasma.plasmoid
+import $qml_module
+import org.kde.kitemmodels
+import org.kde.plasma.plasma5support as Plasma5Support
+
+PlasmoidItem {
+    id: root
+    width: 640
+    height: 520
+
+    property bool italian: Qt.locale().name.toLowerCase().startsWith("it")
+    property var selected: ({})
+    property var initialIds: [$initial_js]
+    property string helperPath: "$helper_file"
+    property string statusText: ""
+
+    function isSelected(id) {
+        return selected[id.toString()] === true;
+    }
+
+    function setSelected(id, checked) {
+        var copy = {};
+        for (var key in selected) {
+            copy[key] = selected[key];
+        }
+        if (checked) {
+            copy[id.toString()] = true;
+        } else {
+            delete copy[id.toString()];
+        }
+        selected = copy;
+    }
+
+    function selectedCount() {
+        var count = 0;
+        for (var key in selected) {
+            if (selected[key] === true) count++;
+        }
+        return count;
+    }
+
+    function selectedCsv() {
+        var ids = [];
+        for (var key in selected) {
+            if (selected[key] === true) ids.push(Number(key));
+        }
+        ids.sort(function(a, b) { return a - b; });
+        return ids.join(",");
+    }
+
+    function submit(value) {
+        statusText = italian ? "Salvataggio selezione…" : "Saving selection…";
+        commandRunner.connectSource(helperPath + " " + value);
+    }
+
+    Component.onCompleted: {
+        var copy = {};
+        for (var i = 0; i < initialIds.length; ++i) {
+            copy[initialIds[i].toString()] = true;
+        }
+        selected = copy;
+    }
+
+    PimCalendarsModel {
+        id: calendarModel
+    }
+
+    KDescendantsProxyModel {
+        id: flatModel
+        model: calendarModel
+    }
+
+    Plasma5Support.DataSource {
+        id: commandRunner
+        engine: "executable"
+        connectedSources: []
+        onNewData: function(source, data) {
+            disconnectSource(source);
+            if (data["exit code"] !== 0) {
+                root.statusText = root.italian ? "Impossibile salvare la selezione." : "Could not save the selection.";
+            }
+        }
+    }
+
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 18
+        spacing: 10
+
+        QQC2.Label {
+            Layout.fillWidth: true
+            text: root.italian
+                ? "Calendari da mostrare in Simple Plasma Agenda"
+                : "Calendars to show in Simple Plasma Agenda"
+            font.bold: true
+            font.pointSize: 13
+            wrapMode: Text.WordWrap
+        }
+
+        QQC2.Label {
+            Layout.fillWidth: true
+            text: root.italian
+                ? "Seleziona solo le sorgenti che vuoi vedere nell’agenda. Questa scelta configura il backend PIM Events; non abilita gli eventi nell’orologio."
+                : "Select only the sources you want in the agenda. This configures the PIM Events backend; it does not enable events in the clock."
+            wrapMode: Text.WordWrap
+        }
+
+        ListView {
+            id: calendarList
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            clip: true
+            model: flatModel
+            spacing: 2
+
+            delegate: QQC2.CheckBox {
+                required property int collectionId
+                required property string name
+                required property bool isEnabled
+
+                width: ListView.view.width
+                visible: isEnabled
+                height: visible ? implicitHeight + 6 : 0
+                enabled: isEnabled
+                text: name + "   (ID " + collectionId + ")"
+                checked: root.isSelected(collectionId)
+                onToggled: root.setSelected(collectionId, checked)
+            }
+        }
+
+        QQC2.Label {
+            Layout.fillWidth: true
+            visible: root.statusText.length > 0
+            text: root.statusText
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            Item { Layout.fillWidth: true }
+
+            QQC2.Button {
+                text: root.italian ? "Annulla" : "Cancel"
+                onClicked: root.submit("CANCEL")
+            }
+
+            QQC2.Button {
+                text: root.italian ? "Conferma" : "Confirm"
+                enabled: root.selectedCount() > 0
+                highlighted: true
+                onClicked: root.submit(root.selectedCsv())
+            }
+        }
+    }
+}
+EOF
+
+    log "Opening the Akonadi calendar selector"
+    plasmawindowed "$probe_id" >"$log_file" 2>&1 &
+    local probe_pid=$!
+
+    while kill -0 "$probe_pid" 2>/dev/null; do
+        [[ -s "$selection_file" ]] && break
+        sleep 0.2
+    done
+
+    local selection=""
+    if [[ -s "$selection_file" ]]; then
+        selection="$(head -n 1 "$selection_file")"
+        kill "$probe_pid" >/dev/null 2>&1 || true
+        wait "$probe_pid" 2>/dev/null || true
+    else
+        wait "$probe_pid" 2>/dev/null || true
+    fi
+
+    if [[ -z "$selection" ]]; then
+        warn "The calendar selector closed without returning a selection."
+        if [[ -s "$log_file" ]]; then
+            printf '\nSelector log (last lines):\n' >&2
+            tail -n 12 "$log_file" >&2 || true
+        fi
+        rm -rf "$probe_dir" "$tmp"
+        return 10
+    fi
+
+    rm -rf "$probe_dir" "$tmp"
+
+    if [[ "$selection" == "CANCEL" ]]; then
+        return 2
+    fi
+    [[ "$selection" =~ ^[0-9]+(,[0-9]+)*$ ]] || die "The calendar selector returned an invalid value."
+
+    kwriteconfig6 --file plasmashellrc --group PIMEventsPlugin --key calendars "$selection"
+
+    local saved
+    saved="$(pimevents_calendar_selection)"
+    [[ "$saved" == "$selection" ]] || die "Could not verify the PIM Events calendar configuration."
+
+    log "PIM Events calendar selection saved: $selection"
+    return 0
+}
+
+configure_pimevents_calendars() {
+    local rc=0
+    run_calendar_selector || rc=$?
+    if [[ $rc -eq 0 ]]; then
+        return 0
+    fi
+
+    if [[ $rc -eq 2 ]]; then
+        printf '\nCalendar selection cancelled.\n'
+        return 2
+    fi
+
+    warn "The automatic calendar selector is unavailable; using the Plasma fallback instructions."
+    manual_pimevents_fallback
+    if ! confirm "Have you configured at least one PIM Events calendar?"; then
+        return 2
+    fi
+
+    local selection
+    selection="$(pimevents_calendar_selection)"
+    if [[ -z "$selection" ]]; then
+        warn "No PIM Events calendar selection was found."
+        return 2
+    fi
+
+    log "Existing PIM Events calendar selection: $selection"
+    return 0
+}
+
 find_package_dir() {
     local base="$1"
 
@@ -351,33 +696,34 @@ calendar_checkpoint() {
 
 System prerequisites are ready.
 
-Now configure at least one calendar before installing the widget.
-KOrganizer is recommended because Simple Plasma Agenda also opens KOrganizer
-when you click an event.
+Now configure at least one calendar in KOrganizer before installing the widget.
+Simple Plasma Agenda uses KOrganizer when you click an event, so it is the
+recommended first-setup path.
 
 Example: Google Calendar in KOrganizer
   1. Open KOrganizer.
   2. Settings -> Configure KOrganizer... -> General -> Calendars -> Add...
      (or right-click the Calendar Manager sidebar -> Add Calendar...).
-  3. Choose "Google Calendars and Tasks".
-  4. Enter your Google account when requested.
+  3. Choose "Google Groupware".
+  4. Select the new Google Groupware resource and choose "Configure".
   5. Complete the Google sign-in/authorization in the browser.
-  6. Return to KOrganizer and wait until the Google resource is ready.
-  7. Make sure the calendars you want are enabled in Calendar Manager.
+  6. Return to KOrganizer and use Apply / OK.
+  7. Wait until the Google resource is ready.
   8. Verify that real events are visible in KOrganizer.
-  9. Preferably also open Plasma's Digital Clock calendar and verify that
-     the same PIM events are visible there.
+
+After this checkpoint, the installer will open a small local selector showing
+Akonadi calendar names. Choose only the calendars you want Simple Plasma Agenda
+to display. This configures pimevents directly; Plasma's Digital Clock does not
+need to display PIM events.
 
 Merkuro can use the same Akonadi resources. If you prefer it, the account page
 is normally under Settings -> Configure Merkuro -> Accounts -> Add Account.
-For the most predictable setup path, add the resource in KOrganizer first;
-it should then also become available in Merkuro.
+For the most predictable first setup, KOrganizer remains recommended.
 
 Other supported Akonadi resources include DAV/CalDAV (for example Nextcloud),
 iCalendar files/folders and local calendars.
 
-This checkpoint is intentionally manual: the installer never handles your
-account password, OAuth choices, credentials or calendar-source selection.
+The installer never handles your account password, OAuth choices or credentials.
 CHECKPOINT
 }
 
@@ -388,8 +734,12 @@ Installation complete.
 
 Desktop -> Add Widgets... -> Simple Plasma Agenda
 
-If events later disappear from KOrganizer/Plasma, solve the Akonadi/PIM
-configuration first: Simple Plasma Agenda only displays what pimevents exposes.
+To change which Akonadi calendars Simple Plasma Agenda receives later, run:
+  install.sh --calendars
+(or ./scripts/install.sh --calendars from a repository checkout).
+
+The calendar list is stored for Plasma's pimevents backend. PIM Events does not
+need to remain enabled in the Digital Clock.
 NEXT
 }
 
@@ -401,8 +751,13 @@ full_install() {
     start_akonadi
     calendar_checkpoint
 
-    if ! confirm "Are calendar events visible and should Simple Plasma Agenda be installed now?"; then
-        printf '\nWidget installation skipped. When ready, run this installer again with --widget.\n'
+    if ! confirm "Are real calendar events visible in KOrganizer?"; then
+        printf '\nSetup paused. Configure a calendar in KOrganizer, then run the installer again.\n'
+        return 0
+    fi
+
+    if ! configure_pimevents_calendars; then
+        printf '\nWidget installation skipped because no PIM Events calendar selection was confirmed.\n'
         return 0
     fi
 
@@ -437,6 +792,12 @@ main() {
             ;;
         --widget)
             install_widget
+            ;;
+        --calendars)
+            check_plasma
+            pim_ready || die "KDE PIM/Akonadi and pimevents must be installed before calendar selection."
+            start_akonadi
+            configure_pimevents_calendars || true
             ;;
         *)
             usage

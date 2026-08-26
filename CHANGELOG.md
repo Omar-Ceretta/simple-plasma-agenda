@@ -12,6 +12,9 @@
 - `install.sh` reso utilizzabile anche come script standalone: fuori dal repository scarica automaticamente `Simple-Plasma-Agenda.plasmoid` dall'ultima release GitHub.
 - `scripts/package.sh` genera sia l'artefatto versionato sia il nome stabile `Simple-Plasma-Agenda.plasmoid` destinato alle release.
 - README ampliato con installazione rapida via `curl`/`wget` e procedura passo passo per configurare Google Calendar in KOrganizer, con Merkuro indicato come alternativa.
+- Aggiunto un selettore grafico temporaneo delle collection Akonadi, eseguito tramite `plasmawindowed`, per scegliere quali calendari fornire a `pimevents` senza usare l'Orologio digitale.
+- Aggiunto `install.sh --calendars` per riaprire il selettore in seguito; la configurazione viene salvata con KConfig (`PIMEventsPlugin/calendars`) senza chiamare `PimCalendarsModel::saveConfig()`.
+- Corretto il percorso Google in KOrganizer: **Aggiungi → Google Groupware → Configura → Applica/OK**.
 
 ### 0.2.20 — 2026-08-26
 
@@ -48,6 +51,9 @@
 - Made `install.sh` usable as a standalone script: outside a repository checkout it automatically downloads `Simple-Plasma-Agenda.plasmoid` from the latest GitHub release.
 - `scripts/package.sh` now creates both the versioned artifact and the stable `Simple-Plasma-Agenda.plasmoid` release asset.
 - Expanded the README with quick `curl`/`wget` installation and step-by-step Google Calendar setup in KOrganizer, with Merkuro documented as an alternative.
+- Added a temporary graphical Akonadi collection selector, run through `plasmawindowed`, to choose which calendars are exposed to `pimevents` without using the Digital Clock.
+- Added `install.sh --calendars` to reopen the selector later; configuration is stored through KConfig (`PIMEventsPlugin/calendars`) without calling `PimCalendarsModel::saveConfig()`.
+- Corrected the Google setup path in KOrganizer: **Add → Google Groupware → Configure → Apply/OK**.
 
 ### 0.2.20 — 2026-08-26
 
