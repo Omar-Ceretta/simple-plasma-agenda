@@ -43,6 +43,10 @@ Nel corso dei test sono stati verificati, a seconda dell'ambiente:
 - Il refresh forzato riguarda soltanto `akonadi_google_resource_*`.
 - Se KOrganizer e il calendario Plasma non vedono gli eventi, il problema va risolto prima nel livello Akonadi/PIM.
 
+## Validazione installer assistito
+
+`scripts/install.sh` è stato aggiunto dopo i test distro sopra elencati. Il suo test completo da una VM senza KDE PIM/Akonadi è **ancora da eseguire** e non viene conteggiato come PASS in questo file.
+
 ## Preflight minimo
 
 ```bash
@@ -97,6 +101,10 @@ Across the tested environments, the following were verified as applicable:
 - Clicking opens the event's **day** in KOrganizer, not the individual event editor.
 - Forced refresh is limited to `akonadi_google_resource_*`.
 - If KOrganizer and Plasma's calendar cannot see the events, solve the Akonadi/PIM layer first.
+
+## Assisted-installer validation
+
+`scripts/install.sh` was added after the distribution tests listed above. A full test starting from a VM without KDE PIM/Akonadi is **still pending** and is not counted as a PASS in this file.
 
 ## Minimal preflight
 

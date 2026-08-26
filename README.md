@@ -54,30 +54,81 @@ Google / CalDAV / Nextcloud / iCalendar / calendario locale
 
 Se gli eventi non sono visibili in Akonadi e in `pimevents`, Simple Plasma Agenda non può mostrarli.
 
-## Installazione essenziale da un Plasma senza PIM
+## Installazione
 
-Questi sono i pacchetti usati nei test. Installano anche **KOrganizer**, consigliato per configurare i calendari e necessario per l'azione clic evento → giorno in KOrganizer.
+### Se KDE PIM / Akonadi sono già configurati
 
-### Fedora KDE
+Puoi usare il normale pacchetto `.plasmoid` o, quando disponibile, **Aggiungi elementi grafici… → Scarica nuovi elementi grafici…** in Plasma.
+
+Per un pacchetto locale:
+
+```bash
+kpackagetool6 -t Plasma/Applet -i com.simple.plasma.agenda-0.2.21.zip
+```
+
+L'installazione per utente finisce sotto:
+
+```text
+~/.local/share/plasma/plasmoids/com.simple.plasma.agenda/
+```
+
+Poi: **Desktop → Aggiungi elementi grafici… → Simple Plasma Agenda**.
+
+### Se parti da Plasma senza PIM: installazione assistita consigliata
+
+Il repository include `scripts/install.sh`. Lo script:
+
+- verifica che il sistema usi Plasma 6;
+- riconosce la famiglia della distribuzione e il package manager appropriato (`dnf`, `apt`, `pacman` o `zypper`);
+- controlla Akonadi, KOrganizer, `busctl` e il plugin Plasma `pimevents`;
+- se manca qualcosa, mostra prima i pacchetti che intende installare e **chiede conferma prima di usare `sudo`**;
+- avvia Akonadi come utente, se necessario;
+- si ferma su un checkpoint manuale: devi aggiungere/autenticare almeno un calendario in KOrganizer e verificare che gli eventi siano visibili;
+- solo dopo la tua conferma installa o aggiorna Simple Plasma Agenda.
+
+Dal repository estratto:
+
+```bash
+chmod +x scripts/install.sh
+./scripts/install.sh
+```
+
+Comandi aggiuntivi:
+
+```bash
+./scripts/install.sh --check    # solo controlli, nessuna modifica
+./scripts/install.sh --deps     # prepara solo KDE PIM / Akonadi
+./scripts/install.sh --widget   # installa/aggiorna solo il plasmoide
+```
+
+Lo script **non** configura account, password o credenziali e non sceglie i calendari al posto dell'utente.
+
+Se l'installazione delle dipendenze non ti interessa, puoi rispondere **No** alla richiesta di conferma: non verrà installato nulla.
+
+### Installazione manuale delle dipendenze
+
+Sono i gruppi di pacchetti usati nei test reali.
+
+**Fedora KDE**
 
 ```bash
 sudo dnf install akonadi-server kdepim-runtime kdepim-addons korganizer
 ```
 
-### Debian / Ubuntu / Kubuntu / KDE neon / TUXEDO OS
+**Debian / Ubuntu / Kubuntu / KDE neon / TUXEDO OS**
 
 ```bash
 sudo apt update
 sudo apt install akonadi-server kdepim-runtime kdepim-addons korganizer
 ```
 
-### Arch Linux
+**Arch Linux**
 
 ```bash
-sudo pacman -S --needed akonadi kdepim-runtime kdepim-addons korganizer
+sudo pacman -Syu --needed akonadi kdepim-runtime kdepim-addons korganizer
 ```
 
-### openSUSE
+**openSUSE**
 
 ```bash
 sudo zypper install akonadi kdepim-runtime kdepim-addons korganizer
@@ -99,7 +150,7 @@ akonadictl start
 
 Non avviare Akonadi come root.
 
-### Aggiungere un calendario
+### Aggiungere e verificare un calendario
 
 Apri KOrganizer e vai in:
 
@@ -109,41 +160,14 @@ Settings → Configure KOrganizer… → General → Calendars → Add…
 
 oppure usa **Add Calendar…** nel pannello laterale dei calendari.
 
-Configura almeno una sorgente supportata da Akonadi, per esempio:
+Configura almeno una sorgente supportata da Akonadi, per esempio Google, CalDAV / Nextcloud, iCalendar o un calendario locale, e completa l'eventuale autenticazione.
 
-- Google Calendars and Tasks;
-- CalDAV / Nextcloud;
-- file iCalendar;
-- calendario locale o altra risorsa Akonadi.
-
-Completa l'eventuale autenticazione richiesta.
-
-### Verifica prima del plasmoide
-
-Prima di installare Simple Plasma Agenda, verifica che gli eventi compaiano:
+Prima di aggiungere Simple Plasma Agenda al desktop, verifica che gli eventi compaiano:
 
 1. in **KOrganizer**;
 2. preferibilmente anche nel calendario dell'**Orologio digitale di Plasma**, con gli eventi PIM attivi.
 
 Se non compaiono lì, il problema è a monte del plasmoide e va risolto nella configurazione Akonadi/PIM.
-
-### Installare Simple Plasma Agenda
-
-Quando sarà pubblicato su KDE Store/Pling, il metodo più semplice sarà l'installazione dalla normale interfaccia **Aggiungi elementi grafici…** di Plasma.
-
-Per un pacchetto ZIP locale:
-
-```bash
-kpackagetool6 -t Plasma/Applet -i com.simple.plasma.agenda-0.2.21.zip
-```
-
-L'installazione per utente finisce sotto:
-
-```text
-~/.local/share/plasma/plasmoids/com.simple.plasma.agenda/
-```
-
-Poi: **Desktop → Aggiungi elementi grafici… → Simple Plasma Agenda**.
 
 ### Note sul refresh Google
 
@@ -238,30 +262,81 @@ Google / CalDAV / Nextcloud / iCalendar / local calendar
 
 If events are not available through Akonadi and `pimevents`, Simple Plasma Agenda cannot display them.
 
-## Essential setup on a Plasma system without PIM
+## Installation
 
-These are the package sets used during testing. They also install **KOrganizer**, recommended for calendar setup and required by the current click event → open day action.
+### If KDE PIM / Akonadi are already configured
 
-### Fedora KDE
+Use the normal `.plasmoid` package or, once available, Plasma's **Add Widgets… → Get New Widgets…** interface.
+
+For a local package:
+
+```bash
+kpackagetool6 -t Plasma/Applet -i com.simple.plasma.agenda-0.2.21.zip
+```
+
+Per-user installation lives under:
+
+```text
+~/.local/share/plasma/plasmoids/com.simple.plasma.agenda/
+```
+
+Then use: **Desktop → Add Widgets… → Simple Plasma Agenda**.
+
+### Starting from Plasma without PIM: assisted installation recommended
+
+The repository includes `scripts/install.sh`. The script:
+
+- checks that the system is running Plasma 6;
+- detects the distribution family and the appropriate package manager (`dnf`, `apt`, `pacman` or `zypper`);
+- checks Akonadi, KOrganizer, `busctl` and Plasma's `pimevents` plugin;
+- if something is missing, shows the packages it intends to install and **asks before using `sudo`**;
+- starts Akonadi as the current user when needed;
+- stops at a manual checkpoint: you must add/authenticate at least one calendar in KOrganizer and verify that events are visible;
+- only after your confirmation installs or updates Simple Plasma Agenda.
+
+From the extracted repository:
+
+```bash
+chmod +x scripts/install.sh
+./scripts/install.sh
+```
+
+Additional modes:
+
+```bash
+./scripts/install.sh --check    # checks only, no changes
+./scripts/install.sh --deps     # prepare KDE PIM / Akonadi only
+./scripts/install.sh --widget   # install/update the widget only
+```
+
+The script does **not** configure accounts, passwords or credentials, and it does not choose calendar sources for the user.
+
+If you do not want the extra KDE PIM packages, answer **No** at the confirmation prompt: nothing will be installed.
+
+### Manual dependency installation
+
+These are the package sets used in the real tests.
+
+**Fedora KDE**
 
 ```bash
 sudo dnf install akonadi-server kdepim-runtime kdepim-addons korganizer
 ```
 
-### Debian / Ubuntu / Kubuntu / KDE neon / TUXEDO OS
+**Debian / Ubuntu / Kubuntu / KDE neon / TUXEDO OS**
 
 ```bash
 sudo apt update
 sudo apt install akonadi-server kdepim-runtime kdepim-addons korganizer
 ```
 
-### Arch Linux
+**Arch Linux**
 
 ```bash
-sudo pacman -S --needed akonadi kdepim-runtime kdepim-addons korganizer
+sudo pacman -Syu --needed akonadi kdepim-runtime kdepim-addons korganizer
 ```
 
-### openSUSE
+**openSUSE**
 
 ```bash
 sudo zypper install akonadi kdepim-runtime kdepim-addons korganizer
@@ -283,7 +358,7 @@ akonadictl start
 
 Do not run Akonadi as root.
 
-### Add a calendar
+### Add and verify a calendar
 
 Open KOrganizer and go to:
 
@@ -293,41 +368,14 @@ Settings → Configure KOrganizer… → General → Calendars → Add…
 
 or use **Add Calendar…** in KOrganizer's calendar sidebar.
 
-Configure at least one Akonadi-supported source, for example:
+Configure at least one Akonadi-supported source, such as Google, CalDAV / Nextcloud, iCalendar or a local calendar, and complete any required authentication.
 
-- Google Calendars and Tasks;
-- CalDAV / Nextcloud;
-- an iCalendar file;
-- a local calendar or another Akonadi resource.
-
-Complete any requested authentication.
-
-### Verify before installing the widget
-
-Before installing Simple Plasma Agenda, make sure events appear:
+Before adding Simple Plasma Agenda to the desktop, make sure events appear:
 
 1. in **KOrganizer**;
 2. preferably also in Plasma's **Digital Clock** calendar with PIM events enabled.
 
 If they do not appear there, the issue is upstream of the widget and should be solved in the Akonadi/PIM setup first.
-
-### Install Simple Plasma Agenda
-
-Once the widget is published on KDE Store/Pling, the simplest route will be Plasma's normal **Add Widgets…** interface.
-
-For a local ZIP package:
-
-```bash
-kpackagetool6 -t Plasma/Applet -i com.simple.plasma.agenda-0.2.21.zip
-```
-
-Per-user installation lives under:
-
-```text
-~/.local/share/plasma/plasmoids/com.simple.plasma.agenda/
-```
-
-Then use: **Desktop → Add Widgets… → Simple Plasma Agenda**.
 
 ### Google refresh notes
 

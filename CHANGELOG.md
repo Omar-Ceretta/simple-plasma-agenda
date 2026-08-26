@@ -8,6 +8,7 @@
 - Coefficienti responsive ricalibrati per mantenere invariata la resa tipografica predefinita.
 - Tooltip del titolo aggiornato a: **«Clicca su un evento per aprirne il giorno su KOrganizer»**.
 - PASS completo su TUXEDO OS Debian-based / Plasma 6.7.2 e KDE neon User Edition 24.04 / Plasma 6.7.4.
+- Aggiunto `scripts/install.sh`: installer assistito con rilevamento `dnf` / `apt` / `pacman` / `zypper`, consenso prima di `sudo` e checkpoint manuale prima dell’installazione del plasmoide.
 
 ### 0.2.20 — 2026-08-26
 
@@ -40,6 +41,7 @@
 - Recalibrated responsive coefficients to preserve the default typography.
 - Updated the title tooltip to: **“Clicca su un evento per aprirne il giorno su KOrganizer”**.
 - Full PASS on TUXEDO OS Debian-based / Plasma 6.7.2 and KDE neon User Edition 24.04 / Plasma 6.7.4.
+- Added `scripts/install.sh`: assisted installer with `dnf` / `apt` / `pacman` / `zypper` detection, confirmation before `sudo`, and a manual checkpoint before widget installation.
 
 ### 0.2.20 — 2026-08-26
 
