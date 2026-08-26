@@ -15,6 +15,7 @@
 - Aggiunto un selettore grafico temporaneo delle collection Akonadi, eseguito tramite `plasmawindowed`, per scegliere quali calendari fornire a `pimevents` senza usare l'Orologio digitale.
 - Aggiunto `install.sh --calendars` per riaprire il selettore in seguito; la configurazione viene salvata con KConfig (`PIMEventsPlugin/calendars`) senza chiamare `PimCalendarsModel::saveConfig()`.
 - Corretto il percorso Google in KOrganizer: **Aggiungi → Google Groupware → Configura → Applica/OK**.
+- L'installer assistito ora usa un **wizard in 5 passaggi**, apre automaticamente KOrganizer e mostra le istruzioni per l'account solo quando necessarie, evitando il precedente blocco di testo unico.
 
 ### 0.2.20 — 2026-08-26
 
@@ -54,6 +55,7 @@
 - Added a temporary graphical Akonadi collection selector, run through `plasmawindowed`, to choose which calendars are exposed to `pimevents` without using the Digital Clock.
 - Added `install.sh --calendars` to reopen the selector later; configuration is stored through KConfig (`PIMEventsPlugin/calendars`) without calling `PimCalendarsModel::saveConfig()`.
 - Corrected the Google setup path in KOrganizer: **Add → Google Groupware → Configure → Apply/OK**.
+- The assisted installer now uses a **5-step wizard**, opens KOrganizer automatically, and shows account instructions only when needed instead of presenting one long checkpoint block.
 
 ### 0.2.20 — 2026-08-26
 

@@ -92,7 +92,8 @@ Lo script viene salvato come file normale in `/tmp`, quindi puoi leggerlo prima 
 - controlla Akonadi, KOrganizer, `busctl` e `pimevents`;
 - se manca qualcosa, mostra i pacchetti e **chiede conferma prima di usare `sudo`**;
 - avvia Akonadi come utente, se necessario;
-- si ferma per permetterti di aggiungere e verificare almeno un calendario in KOrganizer;
+- prosegue come un piccolo **wizard in 5 passaggi**, mostrando via via ciò che è già completato;
+- apre automaticamente KOrganizer e, solo se serve, mostra una breve traccia per aggiungere un calendario (per esempio Google Groupware);
 - apre poi un piccolo **selettore temporaneo dei calendari Akonadi**: scegli solo quelli che vuoi mostrare in Simple Plasma Agenda;
 - registra quella scelta nella normale configurazione globale di `pimevents`, senza usare `PimCalendarsModel::saveConfig()` e senza interrogare direttamente il database Akonadi;
 - elimina il selettore temporaneo e installa/aggiorna il plasmoide.
@@ -203,7 +204,7 @@ KOrganizer è il percorso consigliato perché Simple Plasma Agenda lo usa anche 
 5. Completa accesso e autorizzazione Google nella pagina web aperta dal sistema.
 6. Torna in KOrganizer e premi **Applica / OK**.
 7. Attendi che la risorsa risulti pronta e verifica che gli eventi reali siano visibili in KOrganizer.
-8. Se stai usando `install.sh`, torna al terminale e conferma il checkpoint: comparirà il selettore grafico con le collection Akonadi disponibili. Seleziona **solo** i calendari che vuoi vedere in Simple Plasma Agenda.
+8. Se stai usando `install.sh`, KOrganizer viene aperto automaticamente e il terminale ti guida con una domanda alla volta. Quando confermi che il calendario è pronto, compare il selettore grafico con le collection Akonadi disponibili: scegli **solo** quelle che vuoi vedere in Simple Plasma Agenda.
 
 Non serve attivare PIM Events nell'Orologio digitale. Il selettore dell'installer inizializza direttamente la lista globale usata da `pimevents`.
 
@@ -350,7 +351,8 @@ The script is saved as a normal file under `/tmp`, so you can inspect it before 
 - checks Akonadi, KOrganizer, `busctl` and `pimevents`;
 - if something is missing, shows the packages and **asks before using `sudo`**;
 - starts Akonadi as the current user when needed;
-- pauses so you can add and verify at least one calendar in KOrganizer;
+- continues as a small **5-step wizard**, showing progress as each stage is completed;
+- opens KOrganizer automatically and, only when needed, shows a short path for adding a calendar (for example Google Groupware);
 - then opens a small **temporary Akonadi calendar selector**: choose only the calendars you want Simple Plasma Agenda to display;
 - stores that choice in the normal global `pimevents` configuration, without using `PimCalendarsModel::saveConfig()` and without querying the Akonadi database directly;
 - removes the temporary selector and installs/updates the widget.
@@ -461,7 +463,7 @@ KOrganizer is the recommended path because Simple Plasma Agenda also uses it whe
 5. Complete Google sign-in and authorization in the web page opened by the system.
 6. Return to KOrganizer and click **Apply / OK**.
 7. Wait until the resource is ready and verify that real events are visible in KOrganizer.
-8. If you are using `install.sh`, return to the terminal and confirm the checkpoint: the graphical selector will list the available Akonadi collections. Select **only** the calendars you want Simple Plasma Agenda to display.
+8. If you are using `install.sh`, KOrganizer is opened automatically and the terminal guides you one question at a time. Once you confirm that the calendar is ready, the graphical selector lists the available Akonadi collections: choose **only** those you want Simple Plasma Agenda to display.
 
 You do not need to enable PIM Events in the Digital Clock. The installer selector initializes the global list used by `pimevents` directly.
 

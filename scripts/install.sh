@@ -13,6 +13,26 @@ log()  { printf '\n==> %s\n' "$*"; }
 warn() { printf '\nWARNING: %s\n' "$*" >&2; }
 die()  { printf '\nERROR: %s\n' "$*" >&2; exit 1; }
 
+if [[ -t 1 && "${TERM:-dumb}" != "dumb" ]]; then
+    COLOR_GREEN=$'\033[32m'
+    COLOR_BOLD=$'\033[1m'
+    COLOR_RESET=$'\033[0m'
+else
+    COLOR_GREEN=''
+    COLOR_BOLD=''
+    COLOR_RESET=''
+fi
+
+step() {
+    local number="$1" total="$2" title="$3"
+    printf '\n%s[%s/%s] %s%s\n' "$COLOR_BOLD" "$number" "$total" "$title" "$COLOR_RESET"
+}
+
+step_done() {
+    local number="$1" total="$2" title="$3"
+    printf '%s✓%s [%s/%s] %s\n' "$COLOR_GREEN" "$COLOR_RESET" "$number" "$total" "$title"
+}
+
 usage() {
     cat <<'USAGE'
 Simple Plasma Agenda — assisted installer
@@ -28,9 +48,9 @@ Usage:
 The same script can also be downloaded and run standalone.
 
 Modes:
-  (default)  Check the system, offer to install missing KDE PIM/Akonadi
-             dependencies, start Akonadi, stop for calendar setup, then
-             install/update the widget.
+  (default)  Run the 5-step assisted setup: check the system, prepare KDE
+             PIM/Akonadi, open KOrganizer for calendar setup, select the
+             calendars for pimevents, then install/update the widget.
   --check    Read-only preflight report.
   --deps     Check and, if needed, offer to install KDE PIM/Akonadi only.
   --widget     Install/update only the widget. From a repository checkout it
@@ -218,6 +238,68 @@ confirm() {
         y|Y|yes|YES|Yes) return 0 ;;
         *) return 1 ;;
     esac
+}
+
+wait_enter() {
+    local prompt="$1" answer
+    [[ -t 0 ]] || return 1
+    printf '\n%s' "$prompt"
+    read -r answer
+}
+
+launch_korganizer() {
+    command -v korganizer >/dev/null 2>&1 || return 1
+
+    # KOrganizer is single-instance on the tested Plasma systems: invoking it
+    # also brings an existing instance forward instead of opening duplicates.
+    nohup korganizer >/dev/null 2>&1 </dev/null &
+
+    if command -v pgrep >/dev/null 2>&1; then
+        local i
+        for i in {1..24}; do
+            pgrep -x korganizer >/dev/null 2>&1 && return 0
+            sleep 0.25
+        done
+        return 1
+    fi
+
+    sleep 1
+    return 0
+}
+
+calendar_setup_wizard() {
+    step 3 5 "Connect a calendar in KOrganizer"
+
+    if launch_korganizer; then
+        printf 'KOrganizer has been opened for you.\n'
+    else
+        warn "KOrganizer could not be opened automatically. Start it manually with: korganizer"
+    fi
+
+    if confirm "Is at least one calendar already configured and ready in KOrganizer?"; then
+        step_done 3 5 "Calendar ready in KOrganizer"
+        return 0
+    fi
+
+    cat <<'CALENDAR_HINT'
+
+Google example:
+  Settings -> Configure KOrganizer... -> General -> Calendars -> Add...
+  Google Groupware -> Configure -> sign in in the browser -> Apply / OK
+
+For another provider, choose the matching Akonadi resource instead.
+If the calendar contains events, verify that they appear in KOrganizer.
+CALENDAR_HINT
+
+    wait_enter "Press Enter when the calendar has been configured... " || return 1
+
+    if ! confirm "Is the calendar now configured and ready in KOrganizer?"; then
+        printf '\nSetup paused. Finish the calendar setup in KOrganizer, then run the installer again.\n'
+        return 1
+    fi
+
+    step_done 3 5 "Calendar ready in KOrganizer"
+    return 0
 }
 
 show_dependency_plan() {
@@ -691,42 +773,6 @@ install_widget() {
     trap - RETURN
 }
 
-calendar_checkpoint() {
-    cat <<'CHECKPOINT'
-
-System prerequisites are ready.
-
-Now configure at least one calendar in KOrganizer before installing the widget.
-Simple Plasma Agenda uses KOrganizer when you click an event, so it is the
-recommended first-setup path.
-
-Example: Google Calendar in KOrganizer
-  1. Open KOrganizer.
-  2. Settings -> Configure KOrganizer... -> General -> Calendars -> Add...
-     (or right-click the Calendar Manager sidebar -> Add Calendar...).
-  3. Choose "Google Groupware".
-  4. Select the new Google Groupware resource and choose "Configure".
-  5. Complete the Google sign-in/authorization in the browser.
-  6. Return to KOrganizer and use Apply / OK.
-  7. Wait until the Google resource is ready.
-  8. Verify that real events are visible in KOrganizer.
-
-After this checkpoint, the installer will open a small local selector showing
-Akonadi calendar names. Choose only the calendars you want Simple Plasma Agenda
-to display. This configures pimevents directly; Plasma's Digital Clock does not
-need to display PIM events.
-
-Merkuro can use the same Akonadi resources. If you prefer it, the account page
-is normally under Settings -> Configure Merkuro -> Accounts -> Add Account.
-For the most predictable first setup, KOrganizer remains recommended.
-
-Other supported Akonadi resources include DAV/CalDAV (for example Nextcloud),
-iCalendar files/folders and local calendars.
-
-The installer never handles your account password, OAuth choices or credentials.
-CHECKPOINT
-}
-
 print_next_steps() {
     cat <<'NEXT'
 
@@ -744,25 +790,37 @@ NEXT
 }
 
 full_install() {
-    check_system
+    printf '\n%sSimple Plasma Agenda — assisted setup%s\n' "$COLOR_BOLD" "$COLOR_RESET"
+
+    step 1 5 "Check Plasma and the system"
+    check_plasma
+    detect_package_manager
+    command -v busctl >/dev/null 2>&1 || die "busctl is missing. It is required by Simple Agenda's refresh and KOrganizer integration."
+    printf 'Detected: %s (%s)\n' "$OS_NAME" "$PKG_MANAGER"
+    step_done 1 5 "Plasma/system check complete"
+
+    step 2 5 "Prepare KDE PIM and Akonadi"
     if ! ensure_dependencies; then
         return 0
     fi
     start_akonadi
-    calendar_checkpoint
+    step_done 2 5 "KDE PIM/Akonadi ready"
 
-    if ! confirm "Are real calendar events visible in KOrganizer?"; then
-        printf '\nSetup paused. Configure a calendar in KOrganizer, then run the installer again.\n'
+    if ! calendar_setup_wizard; then
         return 0
     fi
 
+    step 4 5 "Choose calendars for Simple Plasma Agenda"
     if ! configure_pimevents_calendars; then
-        printf '\nWidget installation skipped because no PIM Events calendar selection was confirmed.\n'
+        printf '\nWidget installation skipped because no calendar selection was confirmed.\n'
         return 0
     fi
+    step_done 4 5 "Calendar selection saved"
 
+    step 5 5 "Install Simple Plasma Agenda"
     install_widget
-    check_system
+    step_done 5 5 "Simple Plasma Agenda installed"
+
     print_next_steps
 }
 
