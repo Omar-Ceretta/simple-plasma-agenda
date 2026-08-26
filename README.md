@@ -6,8 +6,8 @@ It is intentionally an agenda, not a full calendar: the monthly calendar view fr
 
 > **Development status**
 >
-> Current local development version: **0.2.19**.  
-> The widget has been tested on **Fedora KDE 44 / Plasma 6**, **Kubuntu 26.04 LTS / Plasma 6.6.4**, and **Arch Linux + KDE Plasma**. Other distribution notes below are still installation guidance until those environments are tested explicitly.
+> Current local development version: **0.2.21**.  
+> The widget has been tested on **Fedora KDE 44 / Plasma 6**, **Kubuntu 26.04 LTS / Plasma 6.6.4**, **Arch Linux + KDE Plasma**, and **openSUSE Tumbleweed / Plasma 6.7.4**. Distribution-specific PASS results below refer to the versions actually tested; 0.2.21 refines the initial desktop geometry and title tooltip and is the next VM-test build.
 
 ## Main features
 
@@ -242,7 +242,7 @@ busctl --user --quiet call \
   synchronize
 ```
 
-This removes the previous `qdbus-qt6` / `qdbus6` command-name difference between distributions. Fedora KDE 44, Kubuntu 26.04 LTS and Arch Linux have now been tested with the `busctl` path. openSUSE Tumbleweed remains a planned VM test.
+This removes the previous `qdbus-qt6` / `qdbus6` command-name difference between distributions. Fedora KDE 44, Kubuntu 26.04 LTS, Arch Linux and openSUSE Tumbleweed have now been tested with the `busctl` path.
 
 The widget deliberately does **not** force synchronization of arbitrary Akonadi resources, because Akonadi may also contain mail, contacts and other agents. Only Google resources matching `akonadi_google_resource_*` are targeted. Other calendar sources remain visible through Akonadi and use their own synchronization mechanisms.
 
@@ -276,7 +276,7 @@ If these components are unavailable, the agenda itself can still display events;
 
 # Distribution notes and test status
 
-Fedora KDE 44, Kubuntu 26.04 LTS and Arch Linux have been tested during development. Commands for the other distributions remain **starting points for planned VM testing**, not compatibility claims.
+Fedora KDE 44, Kubuntu 26.04 LTS, Arch Linux and openSUSE Tumbleweed have been tested during development. Commands for the other distributions remain **starting points for planned VM testing**, not compatibility claims.
 
 ## Kubuntu 26.04 LTS — tested
 
@@ -306,9 +306,15 @@ Verified on the VM: Google Calendar through Akonadi, events in KOrganizer, Plasm
 
 During the initial Google-account setup, before Simple Plasma Agenda had been added to the desktop, the VM hit an upstream `ksecretd --pam-login` crash in the QCA/OpenSSL path. The affected session used `kwallet 6.29.0-1`, `qca-qt6 2.3.10-8` and `openssl 3.6.3-1`. Reinitializing the KWallet/Secret Service processes in the current session and authenticating the Google resource again restored normal operation. This was treated as an Arch/KDE wallet issue, not a plasmoid defect; see `TESTING.md` for the recorded diagnosis.
 
-## openSUSE Tumbleweed
+## openSUSE Tumbleweed — tested
 
-The current Tumbleweed package names to start from are `akonadi`, `kdepim-runtime`, `kdepim-addons` and `korganizer`. Tumbleweed is systemd-based, so the widget's D-Bus helper is expected to be `busctl` there as well. Exact installation behaviour and the presence/location of the Plasma `pimevents` plugin still need a real Tumbleweed test.
+The openSUSE Tumbleweed VM passed the 0.2.19 test cycle on **Plasma 6.7.4**. Relevant packages installed successfully with `zypper`, and Plasma's PIM calendar plugin was present at:
+
+```text
+/usr/lib64/qt6/plugins/plasmacalendarplugins/pimevents.so
+```
+
+Verified on the VM: Google Calendar through Akonadi; events in KOrganizer, Plasma's Digital Clock and Simple Plasma Agenda; manual and automatic Google synchronization; event click opening the correct day in KOrganizer; interaction/configuration checks; and logout/login with automatic synchronization enabled. After login, `akonadictl status` remained `Control: running` / `Server: running`. The tested Google resource reported `status = 0`, `online = true`, and `statusMessage = "Pronto"`.
 
 ## VM pre-flight checks
 

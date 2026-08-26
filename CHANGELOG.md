@@ -2,6 +2,31 @@
 
 Simple Plasma Agenda is still under local pre-release development. These entries document the recent development versions that materially affect cross-distribution testing.
 
+## 0.2.21 — 2026-08-26
+
+### Changed
+
+- Further reduced the initial desktop geometry from **21 × 24** to **19 × 21 Kirigami grid units**, with a stronger reduction in width.
+- Recalibrated only the width-based typography coefficients so the default label/title/event text sizes remain equivalent to 0.2.20 at the new preferred width; density and vertical spacing behavior are otherwise unchanged.
+- Changed the title tooltip to: **“Clicca su un evento per aprirne il giorno su KOrganizer”**.
+
+### Testing status
+
+- This refinement supersedes 0.2.20 before its planned TUXEDO OS VM pass; TUXEDO OS Debian-based will be the first full VM test candidate for 0.2.21.
+
+## 0.2.20 — 2026-08-26
+
+### Changed
+
+- Reduced the initial desktop geometry from **22 × 26** to **21 × 24 Kirigami grid units**.
+- Default typography, density presets, event spacing, minimum resize limits and backend behavior are unchanged.
+- Synchronized the plugin metadata version with the current development version.
+
+### Testing status
+
+- This intermediate geometry-only build was superseded by 0.2.21 before the planned TUXEDO OS VM pass.
+- openSUSE Tumbleweed passed the preceding 0.2.19 build and is recorded below as a completed VM test.
+
 ## 0.2.19 — 2026-08-25
 
 ### Fixed
@@ -14,6 +39,7 @@ Simple Plasma Agenda is still under local pre-release development. These entries
 
 - Kubuntu 26.04 LTS / Plasma 6.6.4 passed logout/login with automatic Google synchronization enabled, with events visible in both Plasma's Digital Clock and Simple Plasma Agenda.
 - Arch Linux + KDE Plasma passed the 0.2.19 VM test cycle: Akonadi/pimevents event display, Google manual and automatic refresh, click-to-KOrganizer, interaction/configuration checks, and logout/login with Akonadi remaining `Control: running` / `Server: running`.
+- openSUSE Tumbleweed / Plasma 6.7.4 passed the 0.2.19 VM test cycle at the first attempt, including Google/Akonadi event display, `pimevents`, manual and automatic refresh, click-to-KOrganizer, interaction/configuration checks, and logout/login with Akonadi remaining `Control: running` / `Server: running`.
 - An unrelated `ksecretd --pam-login` / QCA / OpenSSL crash encountered while initially configuring Google on the Arch VM was isolated before the plasmoid was added and recorded as an upstream environment issue in `TESTING.md`.
 
 ## 0.2.18 — 2026-08-25

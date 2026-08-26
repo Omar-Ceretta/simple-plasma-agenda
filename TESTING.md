@@ -2,7 +2,9 @@
 
 This document records **tests that were actually performed**. Planned environments and expected compatibility are kept separate so that repository documentation does not overstate support.
 
-Current local development version: **0.2.19**.
+Current local development version: **0.2.21**.
+
+The distribution PASS results below record the build that was actually tested. Version 0.2.21 refines the initial preferred desktop geometry and title tooltip; its first full VM pass is planned on the TUXEDO OS Debian-based image.
 
 ## Tested environments
 
@@ -134,6 +136,33 @@ For this VM test, only the affected session services were restarted: `ksecretd` 
 
 Because the failure was reproduced entirely upstream of Simple Plasma Agenda and disappeared once KWallet/Secret Service was restored, it is recorded as a **distribution/KDE PIM environment issue**, not a widget limitation. The later Simple Plasma Agenda logout/login test passed.
 
+### openSUSE Tumbleweed / Plasma 6.7.4 — PASS on 0.2.19
+
+Fresh openSUSE Tumbleweed KDE VM tested with Plasma **6.7.4**.
+
+Recorded pre-flight state:
+
+- `akonadictl status`: `Akonadi Control: running` / `Akonadi Server: running`;
+- Plasma PIM plugin: `/usr/lib64/qt6/plugins/plasmacalendarplugins/pimevents.so`;
+- Google Akonadi resource tested: `akonadi_google_resource_0`;
+- resource state after testing: `status = 0`, `online = true`, `statusMessage = "Pronto"`.
+
+Verified:
+
+- dependency installation through the openSUSE path in `scripts/vm-test-setup.sh`;
+- Google Calendar authentication and synchronization through Akonadi;
+- Google events visible in KOrganizer;
+- the same events visible in Plasma's Digital Clock;
+- the same events visible in Simple Plasma Agenda;
+- manual Google refresh;
+- automatic Google refresh, including the delayed first sync;
+- event click opens the correct day in KOrganizer;
+- interaction and appearance/configuration checks;
+- logout/login with Simple Plasma Agenda present and automatic Google synchronization enabled;
+- after login, Akonadi remained `Control: running` / `Server: running`.
+
+The user journal contained non-blocking messages from `akonadi_control` about host-portal app registration and one `akonadi_birthdays_resource` `DeleteItems` error. They had no observed effect on Google synchronization, Akonadi state, Plasma's Digital Clock or Simple Plasma Agenda, and are not recorded as widget defects.
+
 ## Known project limitations relevant to testing
 
 - Calendar source selection is intentionally **not** implemented inside the plasmoid. Saving PIM calendar selections through Plasma's PIM model was found to crash `plasmashell`; source administration remains in Akonadi/KOrganizer.
@@ -144,8 +173,7 @@ Because the failure was reproduced entirely upstream of Simple Plasma Agenda and
 
 These environments are **not yet recorded as passed**:
 
-- openSUSE Tumbleweed KDE — next planned test;
-- TUXEDO OS (record the exact Debian/Ubuntu base used);
+- TUXEDO OS Debian-based image — next planned test; record the exact image/build used;
 - KDE neon;
 - an additional fresh Fedora KDE installation if useful before public release.
 
