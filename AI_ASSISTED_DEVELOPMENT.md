@@ -1,27 +1,23 @@
-# AI-assisted development disclosure
+# AI-assisted development / Sviluppo assistito da AI
 
-Simple Plasma Agenda is a **human-directed, AI-assisted** open-source project.
+## Italiano
 
-## How AI has been used
+Simple Plasma Agenda è un progetto **diretto da una persona e sviluppato anche con assistenza AI**.
 
-OpenAI ChatGPT has been used during the initial development phase for activities including:
+OpenAI ChatGPT è stato usato per analizzare il codice QML, proporre e rifinire modifiche, interpretare log, preparare traduzioni e documentazione e organizzare i test.
 
-- reading and comparing the upstream QML source;
-- proposing and generating QML changes;
-- refactoring the calendar widget into an agenda-only widget;
-- diagnosing Plasma/Akonadi behavior from logs and backtraces;
-- designing the Google/Akonadi refresh workflow;
-- preparing translations and project documentation;
-- suggesting test cases and repository structure.
+Le scelte funzionali e grafiche, l'accettazione delle modifiche e i test sui sistemi reali restano sotto responsabilità di **Omar Ceretta**.
 
-## Human responsibility
+Questa nota serve solo a rendere trasparente il processo di sviluppo; non modifica attribuzione, licenza o responsabilità sulle versioni pubblicate.
 
-**Omar Ceretta** defines the intended behavior and visual direction, decides which proposals to accept or reject, installs builds on real systems, performs manual tests and reports regressions.
+---
 
-AI-generated or AI-modified code is therefore treated as a contribution that requires human review and testing, not as an automatically trusted result.
+## English
 
-## Why disclose this
+Simple Plasma Agenda is a **human-directed project developed with AI assistance**.
 
-The project aims to make both its **upstream code provenance** and its **development process** easy to understand. The use of AI is not meant to obscure authorship, licensing, or responsibility for published releases.
+OpenAI ChatGPT has been used to analyze QML code, propose and refine changes, interpret logs, prepare translations and documentation, and organize testing.
 
-This disclosure can be updated as the development workflow evolves.
+Functional and visual decisions, acceptance of changes, and testing on real systems remain the responsibility of **Omar Ceretta**.
+
+This note exists only to make the development process transparent; it does not change attribution, licensing or responsibility for published releases.

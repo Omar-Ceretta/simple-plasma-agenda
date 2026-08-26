@@ -1,36 +1,35 @@
 # Contributing
 
-Bug reports, testing results, translations and focused pull requests are welcome.
+## Italiano
 
-## Before reporting a bug
+Simple Plasma Agenda è un piccolo progetto personale sviluppato per passione. Non ha un processo formale di contribuzione.
 
-Please include:
+Segnalazioni concise, traduzioni e patch mirate sono comunque benvenute. Per un bug è utile indicare almeno:
 
-- distribution and version;
-- Plasma version;
-- whether the session is Wayland or X11;
-- whether the issue occurs on a fresh widget instance;
-- relevant `journalctl --user` QML errors, when available;
-- whether events are visible in Plasma's Digital Clock / another Akonadi client.
+- distribuzione e versione di Plasma;
+- cosa ci si aspettava e cosa è successo;
+- se gli stessi eventi sono visibili in KOrganizer e nel calendario dell'Orologio digitale di Plasma.
 
-Do **not** include private calendar data, OAuth tokens, passwords or personal event details.
+Non includere password, token OAuth o dettagli privati degli eventi.
 
-## Code changes
+Le modifiche dovrebbero restare piccole e verificabili. In particolare, la selezione delle sorgenti calendario resta volutamente fuori dal plasmoide.
 
-Keep changes small enough to test independently. In particular, modifications to KDE PIM/Akonadi integration or remote synchronization should be tested carefully before being merged.
+Per l'uso dell'AI nel progetto, vedi [`AI_ASSISTED_DEVELOPMENT.md`](AI_ASSISTED_DEVELOPMENT.md).
 
-The widget intentionally avoids editing the enabled PIM calendar selection from its own settings.
+---
 
-## Translations
+## English
 
-Translatable strings use the domain:
+Simple Plasma Agenda is a small personal project developed for fun. It does not have a formal contribution process.
 
-```text
-plasma_applet_com.simple.plasma.agenda
-```
+Concise bug reports, translations and focused patches are still welcome. For a bug, please include at least:
 
-Italian source translations are kept under `translate/`, with the compiled runtime catalog under `contents/locale/`.
+- distribution and Plasma version;
+- what you expected and what happened;
+- whether the same events are visible in KOrganizer and Plasma's Digital Clock calendar.
 
-## AI-assisted contributions
+Do not include passwords, OAuth tokens or private event details.
 
-AI assistance is welcome, but contributors remain responsible for reviewing, testing and licensing the code they submit. If an AI system was used substantially for a contribution, a short note in the pull request is appreciated.
+Changes should stay small and testable. In particular, calendar-source selection intentionally remains outside the widget.
+
+For AI use in the project, see [`AI_ASSISTED_DEVELOPMENT.md`](AI_ASSISTED_DEVELOPMENT.md).

@@ -1,59 +1,63 @@
 # Changelog
 
-Simple Plasma Agenda is still under local pre-release development. These entries document the recent development versions that materially affect cross-distribution testing.
+## Italiano
 
-## 0.2.21 — 2026-08-26
+### 0.2.21 — 2026-08-26
 
-### Changed
+- Dimensione iniziale ridotta a **19 × 21** unità Kirigami.
+- Coefficienti responsive ricalibrati per mantenere invariata la resa tipografica predefinita.
+- Tooltip del titolo aggiornato a: **«Clicca su un evento per aprirne il giorno su KOrganizer»**.
+- PASS completo su TUXEDO OS Debian-based / Plasma 6.7.2 e KDE neon User Edition 24.04 / Plasma 6.7.4.
 
-- Further reduced the initial desktop geometry from **21 × 24** to **19 × 21 Kirigami grid units**, with a stronger reduction in width.
-- Recalibrated only the width-based typography coefficients so the default label/title/event text sizes remain equivalent to 0.2.20 at the new preferred width; density and vertical spacing behavior are otherwise unchanged.
-- Changed the title tooltip to: **“Clicca su un evento per aprirne il giorno su KOrganizer”**.
+### 0.2.20 — 2026-08-26
 
-### Testing status
+- Prima riduzione della geometria iniziale da **22 × 26** a **21 × 24**.
+- Versione in `metadata.json` riallineata alla versione di sviluppo.
+- Build intermedia, sostituita dalla 0.2.21 prima del test TUXEDO.
 
-- TUXEDO OS (Debian base, codename `forky`) / Plasma 6.7.2 passed the full 0.2.21 VM test cycle: Google/Akonadi event display, `pimevents`, manual and automatic refresh, click-to-KOrganizer, interaction/configuration checks, the refined 19 × 21 initial geometry, and logout/login with Akonadi remaining `Control: running` / `Server: running`.
-- The 19 × 21 initial geometry was accepted after the TUXEDO VM test as the preferred default size.
+### 0.2.19 — 2026-08-25
 
-## 0.2.20 — 2026-08-26
+- Prima sincronizzazione Google automatica ritardata da 1,5 a **20 secondi** dopo l'avvio del plasmoide.
+- Refresh manuale ancora immediato; auto-refresh successivi ogni 5 minuti.
+- PASS su Kubuntu 26.04, Arch Linux e openSUSE Tumbleweed.
 
-### Changed
+### 0.2.18 — 2026-08-25
 
-- Reduced the initial desktop geometry from **22 × 26** to **21 × 24 Kirigami grid units**.
-- Default typography, density presets, event spacing, minimum resize limits and backend behavior are unchanged.
-- Synchronized the plugin metadata version with the current development version.
+- Migliorata la portabilità del clic evento: avvio esplicito di KOrganizer prima dell'attivazione finestra via KWin.
 
-### Testing status
+### 0.2.17 — 2026-08-25
 
-- This intermediate geometry-only build was superseded by 0.2.21 before the planned TUXEDO OS VM pass.
-- openSUSE Tumbleweed passed the preceding 0.2.19 build and is recorded below as a completed VM test.
+- Sostituiti i comandi Qt-specifici `qdbus` con `busctl --user`.
+- Aggiunti hover, focus da tastiera, attivazione Invio/Spazio e metadati di accessibilità.
 
-## 0.2.19 — 2026-08-25
+---
 
-### Fixed
+## English
 
-- Delayed the **first automatic Google/Akonadi forced synchronization** from 1.5 seconds to 20 seconds after plasmoid startup.
-- This prevents a startup race reproduced on Kubuntu 26.04 where an early forced sync could leave Akonadi in `Control: stopped / Server: running` after logout/login.
-- Manual refresh remains immediate and subsequent automatic refreshes remain every 5 minutes.
+### 0.2.21 — 2026-08-26
 
-### Tested
+- Reduced the initial size to **19 × 21** Kirigami grid units.
+- Recalibrated responsive coefficients to preserve the default typography.
+- Updated the title tooltip to: **“Clicca su un evento per aprirne il giorno su KOrganizer”**.
+- Full PASS on TUXEDO OS Debian-based / Plasma 6.7.2 and KDE neon User Edition 24.04 / Plasma 6.7.4.
 
-- Kubuntu 26.04 LTS / Plasma 6.6.4 passed logout/login with automatic Google synchronization enabled, with events visible in both Plasma's Digital Clock and Simple Plasma Agenda.
-- Arch Linux + KDE Plasma passed the 0.2.19 VM test cycle: Akonadi/pimevents event display, Google manual and automatic refresh, click-to-KOrganizer, interaction/configuration checks, and logout/login with Akonadi remaining `Control: running` / `Server: running`.
-- openSUSE Tumbleweed / Plasma 6.7.4 passed the 0.2.19 VM test cycle at the first attempt, including Google/Akonadi event display, `pimevents`, manual and automatic refresh, click-to-KOrganizer, interaction/configuration checks, and logout/login with Akonadi remaining `Control: running` / `Server: running`.
-- An unrelated `ksecretd --pam-login` / QCA / OpenSSL crash encountered while initially configuring Google on the Arch VM was isolated before the plasmoid was added and recorded as an upstream environment issue in `TESTING.md`.
+### 0.2.20 — 2026-08-26
 
-## 0.2.18 — 2026-08-25
+- First reduction of the initial geometry from **22 × 26** to **21 × 24**.
+- Aligned `metadata.json` with the development version.
+- Intermediate build superseded by 0.2.21 before the TUXEDO test.
 
-### Fixed
+### 0.2.19 — 2026-08-25
 
-- Improved event click portability on Kubuntu by explicitly launching KOrganizer between the `showDate` D-Bus request and the KWin window activation step.
-- Kept Fedora behavior compatible with the same sequence through KOrganizer's single-instance behavior.
+- Delayed the first automatic Google synchronization from 1.5 to **20 seconds** after widget startup.
+- Manual refresh remains immediate; later automatic refreshes remain every 5 minutes.
+- PASS on Kubuntu 26.04, Arch Linux and openSUSE Tumbleweed.
 
-## 0.2.17 — 2026-08-25
+### 0.2.18 — 2026-08-25
 
-### Changed
+- Improved event-click portability by explicitly launching KOrganizer before KWin window activation.
 
-- Replaced Qt-specific `qdbus` command dependencies with `busctl --user` for Google synchronization and KOrganizer/KWin D-Bus actions.
-- Added event hover feedback.
-- Added keyboard focus and Enter/Space event activation with accessibility metadata.
+### 0.2.17 — 2026-08-25
+
+- Replaced Qt-specific `qdbus` commands with `busctl --user`.
+- Added hover, keyboard focus, Enter/Space activation and accessibility metadata.
