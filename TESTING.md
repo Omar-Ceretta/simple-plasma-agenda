@@ -4,7 +4,7 @@ This document records **tests that were actually performed**. Planned environmen
 
 Current local development version: **0.2.21**.
 
-The distribution PASS results below record the build that was actually tested. Version 0.2.21 refines the initial preferred desktop geometry and title tooltip; its first full VM pass is planned on the TUXEDO OS Debian-based image.
+The distribution PASS results below record the build that was actually tested. Version 0.2.21 refines the initial preferred desktop geometry to **19 × 21** and updates the title tooltip; it completed its first full VM pass on the TUXEDO OS Debian-based image.
 
 ## Tested environments
 
@@ -163,6 +163,37 @@ Verified:
 
 The user journal contained non-blocking messages from `akonadi_control` about host-portal app registration and one `akonadi_birthdays_resource` `DeleteItems` error. They had no observed effect on Google synchronization, Akonadi state, Plasma's Digital Clock or Simple Plasma Agenda, and are not recorded as widget defects.
 
+### TUXEDO OS (Debian base) / Plasma 6.7.2 — PASS on 0.2.21
+
+Fresh VM using the recovered Debian-based TUXEDO OS image. Recorded environment:
+
+- `NAME="TUXEDO OS"`;
+- `ID=tuxedo`;
+- `ID_LIKE="debian"`;
+- `VERSION_CODENAME=forky`;
+- Plasma: **6.7.2**;
+- Plasma PIM plugin: `/usr/lib/x86_64-linux-gnu/qt6/plugins/plasmacalendarplugins/pimevents.so`;
+- Google Akonadi resource tested: `akonadi_google_resource_0`;
+- resource state after testing: `status = 0`, `online = true`, `statusMessage = "Pronto"`.
+
+Verified:
+
+- dependency installation and Akonadi startup on the Debian-based TUXEDO environment;
+- Akonadi Control and Server running normally;
+- Google Calendar authentication and synchronization through Akonadi;
+- Google events visible in KOrganizer;
+- the same events visible in Plasma's Digital Clock;
+- the same events visible in Simple Plasma Agenda;
+- manual Google refresh;
+- automatic Google refresh, including the delayed first sync;
+- event click opens the correct day in KOrganizer;
+- interaction and appearance/configuration checks;
+- the **19 × 21** initial desktop geometry introduced in 0.2.21 was accepted as the final preferred size;
+- logout/login with Simple Plasma Agenda present and automatic Google synchronization enabled;
+- after login, `akonadictl status` remained `Control: running` / `Server: running`.
+
+The journal contained non-blocking host-portal registration warnings from Akonadi agents and a `DeleteItems` / `No items found` message from `akonadi_birthdays_resource`. They had no observed effect on Google synchronization, Akonadi state, Plasma's Digital Clock or Simple Plasma Agenda and are not recorded as widget defects. `plasmashell --version` also printed `QThreadStorage` cleanup warnings on exit; no functional Plasma issue was observed.
+
 ## Known project limitations relevant to testing
 
 - Calendar source selection is intentionally **not** implemented inside the plasmoid. Saving PIM calendar selections through Plasma's PIM model was found to crash `plasmashell`; source administration remains in Akonadi/KOrganizer.
@@ -173,7 +204,6 @@ The user journal contained non-blocking messages from `akonadi_control` about ho
 
 These environments are **not yet recorded as passed**:
 
-- TUXEDO OS Debian-based image — next planned test; record the exact image/build used;
 - KDE neon;
 - an additional fresh Fedora KDE installation if useful before public release.
 

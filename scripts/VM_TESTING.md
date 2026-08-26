@@ -155,11 +155,13 @@ sudo zypper install akonadi kdepim-runtime kdepim-addons korganizer curl unzip
 akonadictl start
 ```
 
-Development status: **planned test; not yet claimed as supported**.
+Development status: **PASS on Simple Plasma Agenda 0.2.19**.
+
+Tested with Plasma **6.7.4**. `pimevents.so` was present at `/usr/lib64/qt6/plugins/plasmacalendarplugins/pimevents.so`. Google/Akonadi events were verified in KOrganizer, Plasma's Digital Clock and Simple Plasma Agenda; manual and automatic refresh, event activation, interaction/configuration checks and logout/login all passed. After login Akonadi remained `Control: running` / `Server: running`, and the Google resource reported `status = 0`, `online = true`, `statusMessage = "Pronto"`.
 
 ## TUXEDO OS
 
-TUXEDO announced in July 2026 that future TUXEDO OS releases are moving from an Ubuntu base to a Debian base, while existing "TUXEDO OS Legacy" installations remain Ubuntu 24.04-based for now. Both families use APT and the helper therefore detects them through `/etc/os-release` rather than hard-coding a specific TUXEDO base.
+TUXEDO OS was tested on the recovered **Debian-based** image reporting `ID=tuxedo`, `ID_LIKE=debian` and `VERSION_CODENAME=forky`. Existing "TUXEDO OS Legacy" installations may still use the older Ubuntu base. Both families use APT and the helper detects them through `/etc/os-release` rather than hard-coding a specific TUXEDO base.
 
 Start with:
 
@@ -169,7 +171,9 @@ sudo apt install -y akonadi-server kdepim-runtime kdepim-addons korganizer curl 
 akonadictl start
 ```
 
-Development status: **planned test; the exact TUXEDO image/base used must be recorded in TESTING.md**.
+Development status: **PASS on Simple Plasma Agenda 0.2.21**.
+
+Tested on TUXEDO OS (Debian base, codename `forky`) with Plasma **6.7.2**. `pimevents.so` was present at `/usr/lib/x86_64-linux-gnu/qt6/plugins/plasmacalendarplugins/pimevents.so`. Google/Akonadi events were verified in KOrganizer, Plasma's Digital Clock and Simple Plasma Agenda; manual and automatic refresh, event activation, interaction/configuration checks, the 19 × 21 preferred geometry and logout/login all passed. After login Akonadi remained `Control: running` / `Server: running`, and the Google resource reported `status = 0`, `online = true`, `statusMessage = "Pronto"`.
 
 ---
 

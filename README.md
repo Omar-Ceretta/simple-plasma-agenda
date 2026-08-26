@@ -7,7 +7,7 @@ It is intentionally an agenda, not a full calendar: the monthly calendar view fr
 > **Development status**
 >
 > Current local development version: **0.2.21**.  
-> The widget has been tested on **Fedora KDE 44 / Plasma 6**, **Kubuntu 26.04 LTS / Plasma 6.6.4**, **Arch Linux + KDE Plasma**, and **openSUSE Tumbleweed / Plasma 6.7.4**. Distribution-specific PASS results below refer to the versions actually tested; 0.2.21 refines the initial desktop geometry and title tooltip and is the next VM-test build.
+> The widget has been tested on **Fedora KDE 44 / Plasma 6**, **Kubuntu 26.04 LTS / Plasma 6.6.4**, **Arch Linux + KDE Plasma**, **openSUSE Tumbleweed / Plasma 6.7.4**, and **TUXEDO OS (Debian base) / Plasma 6.7.2**. Distribution-specific PASS results below refer to the versions actually tested; 0.2.21 is the first build to complete a full VM pass with the refined **19 × 21** initial desktop geometry and updated title tooltip.
 
 ## Main features
 
@@ -242,7 +242,7 @@ busctl --user --quiet call \
   synchronize
 ```
 
-This removes the previous `qdbus-qt6` / `qdbus6` command-name difference between distributions. Fedora KDE 44, Kubuntu 26.04 LTS, Arch Linux and openSUSE Tumbleweed have now been tested with the `busctl` path.
+This removes the previous `qdbus-qt6` / `qdbus6` command-name difference between distributions. Fedora KDE 44, Kubuntu 26.04 LTS, Arch Linux, openSUSE Tumbleweed and TUXEDO OS (Debian base) have now been tested with the `busctl` path.
 
 The widget deliberately does **not** force synchronization of arbitrary Akonadi resources, because Akonadi may also contain mail, contacts and other agents. Only Google resources matching `akonadi_google_resource_*` are targeted. Other calendar sources remain visible through Akonadi and use their own synchronization mechanisms.
 
@@ -276,7 +276,7 @@ If these components are unavailable, the agenda itself can still display events;
 
 # Distribution notes and test status
 
-Fedora KDE 44, Kubuntu 26.04 LTS, Arch Linux and openSUSE Tumbleweed have been tested during development. Commands for the other distributions remain **starting points for planned VM testing**, not compatibility claims.
+Fedora KDE 44, Kubuntu 26.04 LTS, Arch Linux, openSUSE Tumbleweed and TUXEDO OS (Debian base) have been tested during development. Commands for the other distributions remain **starting points for planned VM testing**, not compatibility claims.
 
 ## Kubuntu 26.04 LTS — tested
 
@@ -292,7 +292,7 @@ Kubuntu did **not** provide an `akonadi_control.service` systemd user unit in th
 
 Version 0.2.19 passed a logout/login test with automatic Google synchronization enabled after the initial forced sync was delayed to 20 seconds. Event display in Plasma's Digital Clock, event display in Simple Plasma Agenda, manual/automatic Google refresh and click-to-KOrganizer were verified during the Kubuntu test cycle.
 
-TUXEDO OS and KDE neon are still separate, untested environments even though they use APT-family packaging.
+KDE neon remains a separate, untested environment even though it uses APT-family packaging.
 
 ## Arch Linux — tested
 
@@ -315,6 +315,16 @@ The openSUSE Tumbleweed VM passed the 0.2.19 test cycle on **Plasma 6.7.4**. Rel
 ```
 
 Verified on the VM: Google Calendar through Akonadi; events in KOrganizer, Plasma's Digital Clock and Simple Plasma Agenda; manual and automatic Google synchronization; event click opening the correct day in KOrganizer; interaction/configuration checks; and logout/login with automatic synchronization enabled. After login, `akonadictl status` remained `Control: running` / `Server: running`. The tested Google resource reported `status = 0`, `online = true`, and `statusMessage = "Pronto"`.
+
+## TUXEDO OS (Debian base) — tested
+
+The recovered Debian-based TUXEDO OS VM (`ID=tuxedo`, `ID_LIKE=debian`, codename **forky**) passed the full **0.2.21** test cycle on **Plasma 6.7.2**. Plasma's PIM calendar plugin was present at:
+
+```text
+/usr/lib/x86_64-linux-gnu/qt6/plugins/plasmacalendarplugins/pimevents.so
+```
+
+Verified on the VM: Google Calendar through Akonadi; events in KOrganizer, Plasma's Digital Clock and Simple Plasma Agenda; manual and automatic Google synchronization; event click opening the correct day in KOrganizer; interaction/configuration checks; the refined **19 × 21** initial geometry; and logout/login with automatic synchronization enabled. After login, Akonadi remained `Control: running` / `Server: running`, and the Google resource reported `status = 0`, `online = true`, `statusMessage = "Pronto"`.
 
 ## VM pre-flight checks
 

@@ -12,7 +12,8 @@ Simple Plasma Agenda is still under local pre-release development. These entries
 
 ### Testing status
 
-- This refinement supersedes 0.2.20 before its planned TUXEDO OS VM pass; TUXEDO OS Debian-based will be the first full VM test candidate for 0.2.21.
+- TUXEDO OS (Debian base, codename `forky`) / Plasma 6.7.2 passed the full 0.2.21 VM test cycle: Google/Akonadi event display, `pimevents`, manual and automatic refresh, click-to-KOrganizer, interaction/configuration checks, the refined 19 × 21 initial geometry, and logout/login with Akonadi remaining `Control: running` / `Server: running`.
+- The 19 × 21 initial geometry was accepted after the TUXEDO VM test as the preferred default size.
 
 ## 0.2.20 — 2026-08-26
 
