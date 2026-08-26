@@ -596,15 +596,15 @@ PlasmoidItem {
         // Initial desktop size: use Kirigami grid units so the preferred
         // geometry follows Plasma/font scaling instead of hard-coded pixels.
         // Minimum sizes remain deliberately permissive for manual resizing.
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 22
-        Layout.preferredHeight: Kirigami.Units.gridUnit * 26
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 19
+        Layout.preferredHeight: Kirigami.Units.gridUnit * 21
         Layout.minimumWidth: 220
         Layout.minimumHeight: 150
 
         readonly property real marginSize: Math.max(12, Math.min(22, Math.round(width * 0.050)))
-        readonly property real labelSize: Math.max(10, Math.min(15, Math.round(width * 0.040)))
+        readonly property real labelSize: Math.max(10, Math.min(15, Math.round(width * 0.0442105263)))
         readonly property real titleSize: Math.max(labelSize + 1, Math.round(labelSize * 1.14))
-        readonly property real baseCardSize: Math.max(10, Math.min(15, Math.round(width * 0.039)))
+        readonly property real baseCardSize: Math.max(10, Math.min(15, Math.round(width * 0.0431052632)))
         readonly property real eventTextScale: plasmoid.configuration.eventTextSize === 0 ? 0.88
                                              : plasmoid.configuration.eventTextSize === 2 ? 1.15
                                              : 1.0
@@ -674,7 +674,7 @@ PlasmoidItem {
                 anchors.right: refreshButton.left
                 anchors.top: parent.top
                 anchors.bottom: separator.top
-                mainText: i18nd(root.trDomain, "Click an event to open its day in KOrganizer")
+                mainText: "Clicca su un evento per aprirne il giorno su KOrganizer"
             }
 
             // Manual refresh: request a real Google -> Akonadi synchronization.
