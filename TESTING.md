@@ -25,7 +25,6 @@ Nel corso dei test sono stati verificati, a seconda dell'ambiente:
 - presenza del plugin Plasma `pimevents`;
 - calendario Google tramite risorsa Akonadi;
 - eventi visibili in KOrganizer;
-- stessi eventi visibili nel calendario dell'Orologio digitale di Plasma;
 - stessi eventi visibili in Simple Plasma Agenda;
 - refresh Google manuale;
 - refresh Google automatico ogni 5 minuti;
@@ -45,7 +44,7 @@ Nel corso dei test sono stati verificati, a seconda dell'ambiente:
 
 ## Validazione installer assistito
 
-`scripts/install.sh` è stato aggiunto dopo i test distro sopra elencati. Su una Fedora KDE 44 fresca sono stati verificati il download pubblico dello script, il rilevamento delle dipendenze già presenti e il download/installazione dell'asset `.plasmoid` dalla GitHub Release. Il test completo da una VM realmente priva di KDE PIM/Akonadi è **ancora da eseguire**. Il selettore grafico temporaneo delle collection Akonadi è stato verificato su Fedora KDE 44; resta da completare il test end-to-end dell'intero flusso da sistema privo di KDE PIM/Akonadi. Il nuovo wizard a passaggi, compresa l'apertura automatica di KOrganizer, deve essere verificato in quel test.
+Su Fedora KDE 44 è stato eseguito anche un test da VM ripulita da KDE PIM/Akonadi: installazione dipendenze, avvio Akonadi, configurazione Google in KOrganizer, selettore Akonadi, scrittura di `PIMEventsPlugin/calendars=27` e installazione del `.plasmoid`. Il test ha inoltre individuato due casi ora gestiti nell'installer: stack KDE/PIM non allineato dopo installazione da ISO e necessità di ricaricare Plasma dopo una nuova selezione `pimevents`. Il comportamento del reload via `plasma-plasmashell.service` è stato verificato manualmente; l'integrazione automatica aggiornata resta da ritestare end-to-end.
 
 ## Preflight minimo
 
@@ -84,7 +83,6 @@ Across the tested environments, the following were verified as applicable:
 - presence of Plasma's `pimevents` plugin;
 - Google Calendar through an Akonadi resource;
 - events visible in KOrganizer;
-- the same events visible in Plasma's Digital Clock calendar;
 - the same events visible in Simple Plasma Agenda;
 - manual Google refresh;
 - automatic Google refresh every 5 minutes;
@@ -104,7 +102,7 @@ Across the tested environments, the following were verified as applicable:
 
 ## Assisted-installer validation
 
-`scripts/install.sh` was added after the distribution tests listed above. On a fresh Fedora KDE 44 system, the public script download, detection of already-present dependencies, and download/installation of the `.plasmoid` asset from the GitHub Release were verified. A full test starting from a VM truly without KDE PIM/Akonadi is **still pending**. The temporary graphical Akonadi collection selector has been verified on Fedora KDE 44; the full end-to-end flow from a system without KDE PIM/Akonadi still needs to be completed. The new step-by-step wizard, including automatic KOrganizer launch, must be verified in that test.
+Fedora KDE 44 was also tested from a VM cleaned of KDE PIM/Akonadi: dependency installation, Akonadi startup, Google setup in KOrganizer, Akonadi selector, writing `PIMEventsPlugin/calendars=27`, and `.plasmoid` installation. The test also exposed two cases now handled by the installer: an out-of-sync KDE/PIM package stack after installing from an older ISO, and the need to reload Plasma after a new `pimevents` selection. Reload behavior through `plasma-plasmashell.service` was verified manually; the updated automatic integration still needs one end-to-end retest.
 
 ## Minimal preflight
 

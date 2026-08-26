@@ -16,6 +16,10 @@
 - Aggiunto `install.sh --calendars` per riaprire il selettore in seguito; la configurazione viene salvata con KConfig (`PIMEventsPlugin/calendars`) senza chiamare `PimCalendarsModel::saveConfig()`.
 - Corretto il percorso Google in KOrganizer: **Aggiungi → Google Groupware → Configura → Applica/OK**.
 - L'installer assistito ora usa un **wizard in 5 passaggi**, apre automaticamente KOrganizer e mostra le istruzioni per l'account solo quando necessarie, evitando il precedente blocco di testo unico.
+- Il passo KOrganizer è stato reso più guidato e ora verifica che l'applicazione resti realmente in esecuzione prima di dichiararne l'apertura.
+- Aggiunto un controllo runtime di KOrganizer: se i pacchetti risultano installati ma le librerie di sistema non sono allineate, l'installer propone un aggiornamento completo tramite il package manager rilevato, previa conferma.
+- Dopo una modifica alla selezione `pimevents`, l'installer propone un reload rapido di Plasma (`plasma-plasmashell.service`, con fallback `plasmashell --replace`) per applicare subito la nuova lista senza reboot.
+- Rimossi dall'output normale dell'installer i riferimenti non necessari agli eventi PIM dell'Orologio digitale.
 
 ### 0.2.20 — 2026-08-26
 
@@ -56,6 +60,10 @@
 - Added `install.sh --calendars` to reopen the selector later; configuration is stored through KConfig (`PIMEventsPlugin/calendars`) without calling `PimCalendarsModel::saveConfig()`.
 - Corrected the Google setup path in KOrganizer: **Add → Google Groupware → Configure → Apply/OK**.
 - The assisted installer now uses a **5-step wizard**, opens KOrganizer automatically, and shows account instructions only when needed instead of presenting one long checkpoint block.
+- The KOrganizer step is now more guided and verifies that the application actually stays running before reporting a successful launch.
+- Added a KOrganizer runtime check: if packages are installed but system libraries are out of sync, the installer offers a full update through the detected package manager, with confirmation first.
+- After a changed `pimevents` selection, the installer offers a quick Plasma reload (`plasma-plasmashell.service`, with `plasmashell --replace` fallback) so the new list takes effect immediately without a reboot.
+- Removed unnecessary Digital Clock PIM Events references from normal installer output.
 
 ### 0.2.20 — 2026-08-26
 

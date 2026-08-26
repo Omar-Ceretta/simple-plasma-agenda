@@ -23,6 +23,10 @@ else
     COLOR_RESET=''
 fi
 
+KORGANIZER_CHECK_ERROR=''
+KORGANIZER_LOG='/tmp/simple-plasma-agenda-korganizer.log'
+PIMEVENTS_SELECTION_CHANGED=0
+
 step() {
     local number="$1" total="$2" title="$3"
     printf '\n%s[%s/%s] %s%s\n' "$COLOR_BOLD" "$number" "$total" "$title" "$COLOR_RESET"
@@ -172,10 +176,27 @@ plasmoid_installed() {
         kpackagetool6 -t Plasma/Applet -s "$APP_ID" >/dev/null 2>&1
 }
 
-pim_ready() {
+pim_components_present() {
     command -v akonadictl >/dev/null 2>&1 && \
         command -v korganizer >/dev/null 2>&1 && \
         [[ -n "$(find_pimevents)" ]]
+}
+
+korganizer_runtime_check() {
+    KORGANIZER_CHECK_ERROR=''
+    command -v korganizer >/dev/null 2>&1 || return 1
+
+    local output
+    if output="$(korganizer --version 2>&1)"; then
+        return 0
+    fi
+
+    KORGANIZER_CHECK_ERROR="$output"
+    return 1
+}
+
+pim_ready() {
+    pim_components_present && korganizer_runtime_check
 }
 
 check_plasma() {
@@ -202,7 +223,13 @@ check_system() {
 
     printf '%-24s %s\n' "kpackagetool6:" "$(command -v kpackagetool6 >/dev/null 2>&1 && printf OK || printf MISSING)"
     printf '%-24s %s\n' "busctl:" "$(command -v busctl >/dev/null 2>&1 && printf OK || printf MISSING)"
-    printf '%-24s %s\n' "KOrganizer:" "$(command -v korganizer >/dev/null 2>&1 && printf OK || printf MISSING)"
+    if ! command -v korganizer >/dev/null 2>&1; then
+        printf '%-24s %s\n' "KOrganizer:" "MISSING"
+    elif korganizer_runtime_check; then
+        printf '%-24s %s\n' "KOrganizer:" "OK"
+    else
+        printf '%-24s %s\n' "KOrganizer:" "BROKEN"
+    fi
 
     if command -v akonadictl >/dev/null 2>&1; then
         local akonadi_status control_status server_status
@@ -240,60 +267,67 @@ confirm() {
     esac
 }
 
-wait_enter() {
+confirm_default_yes() {
     local prompt="$1" answer
     [[ -t 0 ]] || return 1
-    printf '\n%s' "$prompt"
+    printf '\n%s [Y/n] ' "$prompt"
     read -r answer
+    case "$answer" in
+        n|N|no|NO|No) return 1 ;;
+        *) return 0 ;;
+    esac
 }
 
 launch_korganizer() {
-    command -v korganizer >/dev/null 2>&1 || return 1
+    korganizer_runtime_check || return 1
 
-    # KOrganizer is single-instance on the tested Plasma systems: invoking it
-    # also brings an existing instance forward instead of opening duplicates.
-    nohup korganizer >/dev/null 2>&1 </dev/null &
+    : > "$KORGANIZER_LOG"
 
-    if command -v pgrep >/dev/null 2>&1; then
-        local i
-        for i in {1..24}; do
-            pgrep -x korganizer >/dev/null 2>&1 && return 0
-            sleep 0.25
-        done
-        return 1
+    if command -v pgrep >/dev/null 2>&1 && pgrep -x korganizer >/dev/null 2>&1; then
+        return 0
     fi
 
-    sleep 1
-    return 0
+    # KOrganizer is single-instance on the tested Plasma systems. Give it a
+    # few seconds before declaring success: a broken library stack can make the
+    # process appear briefly and then exit before any window is shown.
+    nohup korganizer >"$KORGANIZER_LOG" 2>&1 </dev/null &
+    sleep 3
+
+    if command -v pgrep >/dev/null 2>&1; then
+        pgrep -x korganizer >/dev/null 2>&1 && return 0
+    else
+        return 0
+    fi
+
+    return 1
 }
 
 calendar_setup_wizard() {
     step 3 5 "Connect a calendar in KOrganizer"
 
-    if launch_korganizer; then
-        printf 'KOrganizer has been opened for you.\n'
-    else
-        warn "KOrganizer could not be opened automatically. Start it manually with: korganizer"
+    if ! launch_korganizer; then
+        warn "KOrganizer was installed but did not stay open."
+        if [[ -s "$KORGANIZER_LOG" ]]; then
+            printf '\nKOrganizer output:\n' >&2
+            tail -n 12 "$KORGANIZER_LOG" >&2 || true
+        fi
+        printf '\nSetup paused. Fix KOrganizer, then run the installer again.\n'
+        return 1
     fi
 
-    if confirm "Is at least one calendar already configured and ready in KOrganizer?"; then
-        step_done 3 5 "Calendar ready in KOrganizer"
-        return 0
-    fi
-
+    printf '%s✓%s KOrganizer is open.\n' "$COLOR_GREEN" "$COLOR_RESET"
     cat <<'CALENDAR_HINT'
 
-Google example:
+To add Google Calendar:
   Settings -> Configure KOrganizer... -> General -> Calendars -> Add...
-  Google Groupware -> Configure -> sign in in the browser -> Apply / OK
+  Choose Google Groupware -> Configure
+  Sign in in the browser, then return to KOrganizer and choose Apply / OK.
 
-For another provider, choose the matching Akonadi resource instead.
-If the calendar contains events, verify that they appear in KOrganizer.
+For another provider, choose the matching calendar resource.
+Wait until the calendar is ready and its events appear in KOrganizer.
 CALENDAR_HINT
 
-    wait_enter "Press Enter when the calendar has been configured... " || return 1
-
-    if ! confirm "Is the calendar now configured and ready in KOrganizer?"; then
+    if ! confirm "Are calendar events visible in KOrganizer?"; then
         printf '\nSetup paused. Finish the calendar setup in KOrganizer, then run the installer again.\n'
         return 1
     fi
@@ -324,6 +358,88 @@ show_dependency_plan() {
     esac
 
     printf '\nNo calendar account, password or credential will be configured by this script.\n'
+}
+
+system_update_command() {
+    case "$PKG_MANAGER" in
+        dnf)
+            printf '%s\n' 'sudo dnf upgrade --refresh'
+            ;;
+        apt)
+            printf '%s\n' 'sudo apt-get update && sudo apt-get full-upgrade'
+            ;;
+        pacman)
+            printf '%s\n' 'sudo pacman -Syu'
+            ;;
+        zypper)
+            if [[ "$OS_ID" == "opensuse-tumbleweed" ]]; then
+                printf '%s\n' 'sudo zypper refresh && sudo zypper dist-upgrade'
+            else
+                printf '%s\n' 'sudo zypper refresh && sudo zypper update'
+            fi
+            ;;
+    esac
+}
+
+run_system_update() {
+    case "$PKG_MANAGER" in
+        dnf)
+            sudo dnf upgrade --refresh -y
+            ;;
+        apt)
+            sudo apt-get update
+            sudo apt-get full-upgrade -y
+            ;;
+        pacman)
+            sudo pacman -Syu --noconfirm
+            ;;
+        zypper)
+            sudo zypper --non-interactive refresh
+            if [[ "$OS_ID" == "opensuse-tumbleweed" ]]; then
+                sudo zypper --non-interactive dist-upgrade
+            else
+                sudo zypper --non-interactive update
+            fi
+            ;;
+    esac
+    hash -r
+}
+
+ensure_korganizer_runtime() {
+    korganizer_runtime_check && return 0
+
+    warn "KOrganizer is installed but cannot run with the current system libraries."
+    if [[ -n "$KORGANIZER_CHECK_ERROR" ]]; then
+        printf '\nKOrganizer output:\n%s\n' "$KORGANIZER_CHECK_ERROR" >&2
+    fi
+
+    local update_cmd
+    update_cmd="$(system_update_command)"
+    cat <<EOF
+
+This can happen when an installed OS image and its current repositories are at
+different package generations. A normal full system update is recommended:
+
+  $update_cmd
+EOF
+
+    if ! confirm "Run the system update now?"; then
+        printf '\nSetup paused. Update the system, then run the installer again.\n'
+        return 2
+    fi
+
+    log "Updating the system package stack"
+    run_system_update
+
+    if ! korganizer_runtime_check; then
+        warn "KOrganizer still cannot run after the system update."
+        if [[ -n "$KORGANIZER_CHECK_ERROR" ]]; then
+            printf '\nKOrganizer output:\n%s\n' "$KORGANIZER_CHECK_ERROR" >&2
+        fi
+        die "Cannot continue until KOrganizer starts correctly."
+    fi
+
+    log "KOrganizer runtime check passed."
 }
 
 install_dependencies() {
@@ -364,23 +480,26 @@ install_dependencies() {
 
 ensure_dependencies() {
     check_plasma
+    detect_package_manager
 
     if ! command -v busctl >/dev/null 2>&1; then
         die "busctl is missing. It is required by Simple Agenda's refresh and KOrganizer integration."
     fi
 
-    if pim_ready; then
+    if pim_components_present; then
         log "KDE PIM/Akonadi and pimevents are already available; no system packages need to be installed."
-        return 0
+    else
+        install_dependencies || return $?
+        hash -r
     fi
 
-    install_dependencies || return $?
-
-    if ! pim_ready; then
+    if ! pim_components_present; then
         warn "The package installation completed, but one or more required components are still missing."
         check_system
         die "Cannot continue automatically. See README.md for manual installation checks."
     fi
+
+    ensure_korganizer_runtime || return $?
 }
 
 start_akonadi() {
@@ -575,8 +694,8 @@ PlasmoidItem {
         QQC2.Label {
             Layout.fillWidth: true
             text: root.italian
-                ? "Seleziona solo le sorgenti che vuoi vedere nell’agenda. Questa scelta configura il backend PIM Events; non abilita gli eventi nell’orologio."
-                : "Select only the sources you want in the agenda. This configures the PIM Events backend; it does not enable events in the clock."
+                ? "Seleziona solo le sorgenti che vuoi vedere nell’agenda."
+                : "Select only the sources you want in the agenda."
             wrapMode: Text.WordWrap
         }
 
@@ -670,12 +789,20 @@ EOF
     saved="$(pimevents_calendar_selection)"
     [[ "$saved" == "$selection" ]] || die "Could not verify the PIM Events calendar configuration."
 
+    if [[ "$saved" != "$initial_csv" ]]; then
+        PIMEVENTS_SELECTION_CHANGED=1
+    else
+        PIMEVENTS_SELECTION_CHANGED=0
+    fi
+
     log "PIM Events calendar selection saved: $selection"
     return 0
 }
 
 configure_pimevents_calendars() {
-    local rc=0
+    local rc=0 before_selection
+    PIMEVENTS_SELECTION_CHANGED=0
+    before_selection="$(pimevents_calendar_selection)"
     run_calendar_selector || rc=$?
     if [[ $rc -eq 0 ]]; then
         return 0
@@ -699,7 +826,63 @@ configure_pimevents_calendars() {
         return 2
     fi
 
+    if [[ "$selection" != "$before_selection" ]]; then
+        PIMEVENTS_SELECTION_CHANGED=1
+    fi
+
     log "Existing PIM Events calendar selection: $selection"
+    return 0
+}
+
+reload_plasma_shell() {
+    command -v plasmashell >/dev/null 2>&1 || return 1
+
+    local old_pid new_pid i
+    old_pid="$(pgrep -n -x plasmashell 2>/dev/null || true)"
+
+    if command -v systemctl >/dev/null 2>&1 && \
+       systemctl --user show plasma-plasmashell.service -p LoadState --value 2>/dev/null | grep -qx loaded && \
+       systemctl --user is-active --quiet plasma-plasmashell.service; then
+        systemctl --user restart plasma-plasmashell.service || return 1
+    else
+        nohup plasmashell --replace >/tmp/simple-plasma-agenda-plasmashell.log 2>&1 </dev/null &
+    fi
+
+    for i in {1..40}; do
+        new_pid="$(pgrep -n -x plasmashell 2>/dev/null || true)"
+        if [[ -n "$new_pid" && "$new_pid" != "$old_pid" ]]; then
+            if command -v systemctl >/dev/null 2>&1 && \
+               systemctl --user show plasma-plasmashell.service -p LoadState --value 2>/dev/null | grep -qx loaded; then
+                systemctl --user is-active --quiet plasma-plasmashell.service || { sleep 0.25; continue; }
+            fi
+            return 0
+        fi
+        sleep 0.25
+    done
+
+    return 1
+}
+
+apply_pimevents_selection_runtime() {
+    [[ $PIMEVENTS_SELECTION_CHANGED -eq 1 ]] || return 0
+
+    cat <<'RELOAD'
+
+Plasma needs a quick reload to apply the new calendar selection.
+Your open applications will stay open; the desktop and panel may disappear for a moment.
+RELOAD
+
+    if ! confirm_default_yes "Reload Plasma now?"; then
+        warn "The selection is saved, but it will take effect after the next Plasma login/restart."
+        return 0
+    fi
+
+    if reload_plasma_shell; then
+        printf '%s✓%s Plasma reloaded.\n' "$COLOR_GREEN" "$COLOR_RESET"
+        return 0
+    fi
+
+    warn "Plasma could not be reloaded automatically. The saved selection will take effect after the next login/restart."
     return 0
 }
 
@@ -784,8 +967,6 @@ To change which Akonadi calendars Simple Plasma Agenda receives later, run:
   install.sh --calendars
 (or ./scripts/install.sh --calendars from a repository checkout).
 
-The calendar list is stored for Plasma's pimevents backend. PIM Events does not
-need to remain enabled in the Digital Clock.
 NEXT
 }
 
@@ -815,6 +996,7 @@ full_install() {
         printf '\nWidget installation skipped because no calendar selection was confirmed.\n'
         return 0
     fi
+    apply_pimevents_selection_runtime
     step_done 4 5 "Calendar selection saved"
 
     step 5 5 "Install Simple Plasma Agenda"
@@ -855,7 +1037,9 @@ main() {
             check_plasma
             pim_ready || die "KDE PIM/Akonadi and pimevents must be installed before calendar selection."
             start_akonadi
-            configure_pimevents_calendars || true
+            if configure_pimevents_calendars; then
+                apply_pimevents_selection_runtime
+            fi
             ;;
         *)
             usage
