@@ -93,6 +93,7 @@ Lo script viene salvato come file normale in `/tmp`, quindi puoi leggerlo prima 
 - se manca qualcosa, mostra i pacchetti e **chiede conferma prima di usare `sudo`**;
 - verifica anche che KOrganizer riesca realmente ad avviarsi con le librerie installate;
 - se rileva uno stack di pacchetti non allineato, propone un normale aggiornamento completo del sistema con il package manager rilevato, sempre previa conferma;
+- su openSUSE Tumbleweed riallinea lo snapshot rolling con `zypper refresh` + `zypper dist-upgrade` prima di installare KDE PIM, chiedendo esplicitamente conferma;
 - avvia Akonadi come utente, se necessario;
 - prosegue come un piccolo **wizard in 5 passaggi**, mostrando via via ciò che è già completato;
 - apre automaticamente KOrganizer e mostra una traccia breve ma concreta per aggiungere un calendario (per esempio Google Groupware);
@@ -174,9 +175,11 @@ sudo apt install akonadi-server kdepim-runtime kdepim-addons korganizer
 sudo pacman -Syu --needed akonadi kdepim-runtime kdepim-addons korganizer
 ```
 
-**openSUSE**
+**openSUSE Tumbleweed**
 
 ```bash
+sudo zypper refresh
+sudo zypper dist-upgrade
 sudo zypper install akonadi kdepim-runtime kdepim-addons korganizer
 ```
 
@@ -353,6 +356,7 @@ The script is saved as a normal file under `/tmp`, so you can inspect it before 
 - if something is missing, shows the packages and **asks before using `sudo`**;
 - also verifies that KOrganizer can actually start with the installed libraries;
 - if the package stack is out of sync, offers a normal full system update through the detected package manager, always with confirmation first;
+- on openSUSE Tumbleweed, aligns the rolling snapshot with `zypper refresh` + `zypper dist-upgrade` before installing KDE PIM, with explicit confirmation;
 - starts Akonadi as the current user when needed;
 - continues as a small **5-step wizard**, showing progress as each stage is completed;
 - opens KOrganizer automatically and shows a short, concrete path for adding a calendar (for example Google Groupware);
@@ -434,9 +438,11 @@ sudo apt install akonadi-server kdepim-runtime kdepim-addons korganizer
 sudo pacman -Syu --needed akonadi kdepim-runtime kdepim-addons korganizer
 ```
 
-**openSUSE**
+**openSUSE Tumbleweed**
 
 ```bash
+sudo zypper refresh
+sudo zypper dist-upgrade
 sudo zypper install akonadi kdepim-runtime kdepim-addons korganizer
 ```
 

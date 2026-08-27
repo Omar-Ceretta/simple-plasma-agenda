@@ -80,6 +80,10 @@ is_debian_family() {
     [[ "$OS_ID" == "debian" || "$OS_ID" == "ubuntu" || "$OS_ID" == "kubuntu" || "$OS_ID" == "neon" || "$OS_ID" == "tuxedo" || " $OS_LIKE " == *" debian "* || " $OS_LIKE " == *" ubuntu "* ]]
 }
 
+is_tumbleweed() {
+    [[ "$OS_ID" == "opensuse-tumbleweed" || "$OS_NAME" == *"Tumbleweed"* ]]
+}
+
 detect_package_manager() {
     load_os_release
 
@@ -353,7 +357,14 @@ show_dependency_plan() {
             printf '\nThe installer will refresh APT package indexes before installing.\n'
             ;;
         zypper)
-            printf '\nThe installer will refresh zypper repositories before installing.\n'
+            if is_tumbleweed; then
+                printf '\nopenSUSE Tumbleweed is a rolling release and must be kept on one\n'
+                printf 'consistent repository snapshot. The installer will run a normal\n'
+                printf 'distribution upgrade before installing KDE PIM:\n'
+                printf '  zypper refresh && zypper dist-upgrade\n'
+            else
+                printf '\nThe installer will refresh zypper repositories before installing.\n'
+            fi
             ;;
     esac
 
@@ -372,7 +383,7 @@ system_update_command() {
             printf '%s\n' 'sudo pacman -Syu'
             ;;
         zypper)
-            if [[ "$OS_ID" == "opensuse-tumbleweed" ]]; then
+            if is_tumbleweed; then
                 printf '%s\n' 'sudo zypper refresh && sudo zypper dist-upgrade'
             else
                 printf '%s\n' 'sudo zypper refresh && sudo zypper update'
@@ -395,7 +406,7 @@ run_system_update() {
             ;;
         zypper)
             sudo zypper --non-interactive refresh
-            if [[ "$OS_ID" == "opensuse-tumbleweed" ]]; then
+            if is_tumbleweed; then
                 sudo zypper --non-interactive dist-upgrade
             else
                 sudo zypper --non-interactive update
@@ -449,7 +460,11 @@ install_dependencies() {
     packages="$(package_list)"
 
     show_dependency_plan "$packages"
-    if ! confirm "Continue with system package installation using sudo?"; then
+    local install_prompt="Continue with system package installation using sudo?"
+    if [[ "$PKG_MANAGER" == "zypper" ]] && is_tumbleweed; then
+        install_prompt="Continue with the Tumbleweed distribution upgrade and package installation using sudo?"
+    fi
+    if ! confirm "$install_prompt"; then
         printf '\nNothing was installed. You can run this installer again later.\n'
         return 2
     fi
@@ -471,9 +486,25 @@ install_dependencies() {
             sudo pacman -Syu --needed --noconfirm $packages
             ;;
         zypper)
-            sudo zypper --non-interactive refresh
+            if ! sudo zypper --non-interactive refresh; then
+                warn "zypper repository refresh failed."
+                return 1
+            fi
+            if is_tumbleweed; then
+                log "Aligning openSUSE Tumbleweed to the current repository snapshot"
+                if ! sudo zypper --non-interactive dist-upgrade; then
+                    warn "The Tumbleweed distribution upgrade did not complete."
+                    printf '\nNo widget files were installed. Resolve the zypper issue, then run the installer again.\n' >&2
+                    return 1
+                fi
+                hash -r
+            fi
             # shellcheck disable=SC2086
-            sudo zypper --non-interactive install $packages
+            if ! sudo zypper --non-interactive install $packages; then
+                warn "KDE PIM/Akonadi package installation failed."
+                printf '\nNo widget files were installed. Resolve the zypper issue, then run the installer again.\n' >&2
+                return 1
+            fi
             ;;
     esac
 }
