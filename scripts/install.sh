@@ -959,9 +959,19 @@ install_widget() {
 print_next_steps() {
     cat <<'NEXT'
 
-Installation complete.
++--------------------------------------------------------------+
+|  ✓ Simple Plasma Agenda is installed!                       |
++--------------------------------------------------------------+
 
-Desktop -> Add Widgets... -> Simple Plasma Agenda
+Now add it to your desktop:
+
+  Desktop
+    -> Enter Edit Mode
+    -> Add or Manage Widgets
+    -> Simple Plasma Agenda
+    -> Exit Edit Mode
+
+Your agenda is ready.
 
 To change which Akonadi calendars Simple Plasma Agenda receives later, run:
   install.sh --calendars

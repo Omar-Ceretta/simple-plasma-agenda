@@ -21,6 +21,8 @@
 - Dopo una modifica alla selezione `pimevents`, l'installer propone un reload rapido di Plasma (`plasma-plasmashell.service`, con fallback `plasmashell --replace`) per applicare subito la nuova lista senza reboot.
 - Rimossi dall'output normale dell'installer i riferimenti non necessari agli eventi PIM dell'Orologio digitale.
 - Validato su Fedora KDE 44 il flusso assistito completo da VM ripulita da KDE PIM/Akonadi: configurazione Google, selettore Akonadi, reload automatico di Plasma solo quando necessario, installazione SPA e visualizzazione immediata degli eventi: **PASS**.
+- Validato end-to-end anche su **Arch Linux / Plasma 6.7.4**, partendo senza KDE PIM/Akonadi e reinstallando lo stack tramite `pacman -Syu --needed`: **PASS**.
+- Reso più evidente il completamento dell’installer e aggiornato il percorso Plasma corrente per aggiungere il widget: **Entra in modalità di modifica → Aggiungi o gestisci oggetti → Simple Plasma Agenda → Esci dalla modalità di modifica**.
 
 ### 0.2.20 — 2026-08-26
 
@@ -66,6 +68,8 @@
 - After a changed `pimevents` selection, the installer offers a quick Plasma reload (`plasma-plasmashell.service`, with `plasmashell --replace` fallback) so the new list takes effect immediately without a reboot.
 - Removed unnecessary Digital Clock PIM Events references from normal installer output.
 - Validated the full assisted flow on Fedora KDE 44 from a VM cleaned of KDE PIM/Akonadi: Google setup, Akonadi selector, automatic Plasma reload only when required, SPA installation, and immediate event display: **PASS**.
+- Also validated end-to-end on **Arch Linux / Plasma 6.7.4**, starting without KDE PIM/Akonadi and reinstalling the stack through `pacman -Syu --needed`: **PASS**.
+- Made installer completion more prominent and updated the current Plasma path for adding the widget: **Enter Edit Mode → Add or Manage Widgets → Simple Plasma Agenda → Exit Edit Mode**.
 
 ### 0.2.20 — 2026-08-26
 

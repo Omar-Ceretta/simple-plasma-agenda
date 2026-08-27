@@ -137,7 +137,7 @@ L'installazione per utente finisce sotto:
 ~/.local/share/plasma/plasmoids/com.simple.plasma.agenda/
 ```
 
-Poi: **Desktop → Aggiungi elementi grafici… → Simple Plasma Agenda**.
+Poi: **Desktop → Entra in modalità di modifica → Aggiungi o gestisci oggetti → Simple Plasma Agenda → Esci dalla modalità di modifica**.
 
 Se gli eventi sono visibili in KOrganizer ma SPA resta vuota, inizializza o modifica la selezione di `pimevents` con:
 
@@ -397,7 +397,7 @@ Per-user installation lives under:
 ~/.local/share/plasma/plasmoids/com.simple.plasma.agenda/
 ```
 
-Then use: **Desktop → Add Widgets… → Simple Plasma Agenda**.
+Then use: **Desktop → Enter Edit Mode → Add or Manage Widgets → Simple Plasma Agenda → Exit Edit Mode**.
 
 If events are visible in KOrganizer but SPA remains empty, initialize or change the `pimevents` selection with:
 
