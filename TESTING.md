@@ -11,7 +11,7 @@ Versione di sviluppo corrente: **0.2.21**.
 | Ambiente | Plasma | Build SPA provata | Esito |
 | --- | --- | --- | --- |
 | Fedora KDE 44 | Plasma 6 | 0.2.21 | PASS |
-| Kubuntu 26.04 LTS | 6.6.4 | 0.2.19 | PASS |
+| Kubuntu 26.04 LTS (Ubuntu 26.04 base) | 6.6.4 | 0.2.21 | PASS |
 | Arch Linux + KDE | 6.7.4 | 0.2.21 | PASS |
 | openSUSE Tumbleweed | 6.7.4 | 0.2.19 | PASS |
 | TUXEDO OS Debian base (`forky`) | 6.7.2 | 0.2.21 | PASS |
@@ -48,6 +48,8 @@ Su Fedora KDE 44 è stato eseguito un test end-to-end da VM ripulita da KDE PIM/
 
 Su Arch Linux / Plasma 6.7.4 è stato eseguito lo stesso test end-to-end partendo da una VM ripulita da KDE PIM/Akonadi: installazione tramite `pacman -Syu --needed`, avvio di KOrganizer, configurazione Google, selezione Akonadi, reload di Plasma quando richiesto e installazione finale di SPA: **PASS**. Al termine Akonadi risultava operativo, `PIMEventsPlugin/calendars=27` era salvato e il plasmoide installato correttamente.
 
+Su Kubuntu 26.04 LTS / Plasma 6.6.4 è stato eseguito il test end-to-end partendo senza KDE PIM/Akonadi: installazione tramite `apt`, avvio di KOrganizer, configurazione Google, selezione Akonadi, reload di Plasma e installazione finale di SPA: **PASS**. Al termine Akonadi risultava operativo, la collection scelta era salvata in `PIMEventsPlugin/calendars` e il plasmoide installato correttamente.
+
 ## Preflight minimo
 
 ```bash
@@ -71,7 +73,7 @@ Current development version: **0.2.21**.
 | Environment | Plasma | SPA build tested | Result |
 | --- | --- | --- | --- |
 | Fedora KDE 44 | Plasma 6 | 0.2.21 | PASS |
-| Kubuntu 26.04 LTS | 6.6.4 | 0.2.19 | PASS |
+| Kubuntu 26.04 LTS (Ubuntu 26.04 base) | 6.6.4 | 0.2.21 | PASS |
 | Arch Linux + KDE | 6.7.4 | 0.2.21 | PASS |
 | openSUSE Tumbleweed | 6.7.4 | 0.2.19 | PASS |
 | TUXEDO OS Debian base (`forky`) | 6.7.2 | 0.2.21 | PASS |
@@ -107,6 +109,8 @@ Across the tested environments, the following were verified as applicable:
 Fedora KDE 44 was tested end-to-end from a VM cleaned of KDE PIM/Akonadi: dependency installation, Akonadi startup, Google setup in KOrganizer, Akonadi selector, writing `PIMEventsPlugin/calendars=27`, automatic Plasma reload when required, and `.plasmoid` installation: **PASS**. It was also verified that no reload is offered when the selection is unchanged and that SPA shows events immediately after a changed selection, without a reboot. An out-of-sync KDE/PIM stack was also reproduced during testing; the related runtime check and update offer are now present in the installer, but that recovery branch has not been re-run end-to-end after the change.
 
 Arch Linux / Plasma 6.7.4 was tested through the same end-to-end flow from a VM cleaned of KDE PIM/Akonadi: installation through `pacman -Syu --needed`, KOrganizer startup, Google setup, Akonadi selection, Plasma reload when required, and final SPA installation: **PASS**. At completion Akonadi was running, `PIMEventsPlugin/calendars=27` was stored, and the widget was installed correctly.
+
+Kubuntu 26.04 LTS / Plasma 6.6.4 was tested end-to-end starting without KDE PIM/Akonadi: installation through `apt`, KOrganizer startup, Google setup, Akonadi selection, Plasma reload, and final SPA installation: **PASS**. At completion Akonadi was running, the selected collection was stored in `PIMEventsPlugin/calendars`, and the widget was installed correctly.
 
 ## Minimal preflight
 

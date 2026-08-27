@@ -22,6 +22,7 @@
 - Rimossi dall'output normale dell'installer i riferimenti non necessari agli eventi PIM dell'Orologio digitale.
 - Validato su Fedora KDE 44 il flusso assistito completo da VM ripulita da KDE PIM/Akonadi: configurazione Google, selettore Akonadi, reload automatico di Plasma solo quando necessario, installazione SPA e visualizzazione immediata degli eventi: **PASS**.
 - Validato end-to-end anche su **Arch Linux / Plasma 6.7.4**, partendo senza KDE PIM/Akonadi e reinstallando lo stack tramite `pacman -Syu --needed`: **PASS**.
+- Validato end-to-end anche su **Kubuntu 26.04 LTS / Plasma 6.6.4**, partendo senza KDE PIM/Akonadi e ricostruendo lo stack tramite `apt`: **PASS**.
 - Reso più evidente il completamento dell’installer e aggiornato il percorso Plasma corrente per aggiungere il widget: **Entra in modalità di modifica → Aggiungi o gestisci oggetti → Simple Plasma Agenda → Esci dalla modalità di modifica**.
 
 ### 0.2.20 — 2026-08-26
@@ -69,6 +70,7 @@
 - Removed unnecessary Digital Clock PIM Events references from normal installer output.
 - Validated the full assisted flow on Fedora KDE 44 from a VM cleaned of KDE PIM/Akonadi: Google setup, Akonadi selector, automatic Plasma reload only when required, SPA installation, and immediate event display: **PASS**.
 - Also validated end-to-end on **Arch Linux / Plasma 6.7.4**, starting without KDE PIM/Akonadi and reinstalling the stack through `pacman -Syu --needed`: **PASS**.
+- Also validated end-to-end on **Kubuntu 26.04 LTS / Plasma 6.6.4**, starting without KDE PIM/Akonadi and rebuilding the stack through `apt`: **PASS**.
 - Made installer completion more prominent and updated the current Plasma path for adding the widget: **Enter Edit Mode → Add or Manage Widgets → Simple Plasma Agenda → Exit Edit Mode**.
 
 ### 0.2.20 — 2026-08-26
