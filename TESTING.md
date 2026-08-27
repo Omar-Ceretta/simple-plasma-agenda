@@ -14,6 +14,7 @@ Versione di sviluppo corrente: **0.2.21**.
 | Kubuntu 26.04 LTS (Ubuntu 26.04 base) | 6.6.4 | 0.2.21 | PASS |
 | Arch Linux + KDE | 6.7.4 | 0.2.21 | PASS |
 | openSUSE Tumbleweed | 6.7.4 | 0.2.21 | PASS |
+| openSUSE Leap 16.0 | 6.4.2 | 0.2.21 | PASS |
 | TUXEDO OS Debian base (`forky`) | 6.7.2 | 0.2.21 | PASS |
 | KDE neon User Edition 24.04 (`noble`) | 6.7.4 | 0.2.21 | PASS |
 
@@ -52,6 +53,8 @@ Su Kubuntu 26.04 LTS / Plasma 6.6.4 è stato eseguito il test end-to-end partend
 
 Su openSUSE Tumbleweed / Plasma 6.7.4 è stato eseguito il test end-to-end partendo senza KDE PIM/Akonadi: riallineamento dello snapshot rolling con `zypper refresh` + `zypper dist-upgrade`, installazione delle dipendenze, avvio di KOrganizer, configurazione Google, selezione Akonadi, reload di Plasma e installazione finale di SPA: **PASS**.
 
+Su openSUSE Leap 16.0 / Plasma 6.4.2 è stato eseguito il test end-to-end partendo senza KDE PIM/Akonadi: installazione tramite il normale percorso `zypper` stabile, senza `dist-upgrade` preventivo, avvio di KOrganizer, configurazione Google, selezione Akonadi, reload di Plasma e installazione finale di SPA: **PASS**.
+
 ## Preflight minimo
 
 ```bash
@@ -78,6 +81,7 @@ Current development version: **0.2.21**.
 | Kubuntu 26.04 LTS (Ubuntu 26.04 base) | 6.6.4 | 0.2.21 | PASS |
 | Arch Linux + KDE | 6.7.4 | 0.2.21 | PASS |
 | openSUSE Tumbleweed | 6.7.4 | 0.2.21 | PASS |
+| openSUSE Leap 16.0 | 6.4.2 | 0.2.21 | PASS |
 | TUXEDO OS Debian base (`forky`) | 6.7.2 | 0.2.21 | PASS |
 | KDE neon User Edition 24.04 (`noble`) | 6.7.4 | 0.2.21 | PASS |
 
@@ -115,6 +119,8 @@ Arch Linux / Plasma 6.7.4 was tested through the same end-to-end flow from a VM 
 Kubuntu 26.04 LTS / Plasma 6.6.4 was tested end-to-end starting without KDE PIM/Akonadi: installation through `apt`, KOrganizer startup, Google setup, Akonadi selection, Plasma reload, and final SPA installation: **PASS**. At completion Akonadi was running, the selected collection was stored in `PIMEventsPlugin/calendars`, and the widget was installed correctly.
 
 openSUSE Tumbleweed / Plasma 6.7.4 was tested end-to-end starting without KDE PIM/Akonadi: rolling-snapshot alignment through `zypper refresh` + `zypper dist-upgrade`, dependency installation, KOrganizer startup, Google setup, Akonadi selection, Plasma reload, and final SPA installation: **PASS**.
+
+openSUSE Leap 16.0 / Plasma 6.4.2 was tested end-to-end starting without KDE PIM/Akonadi: installation through the normal stable `zypper` path, with no preventive `dist-upgrade`, KOrganizer startup, Google setup, Akonadi selection, Plasma reload, and final SPA installation: **PASS**.
 
 ## Minimal preflight
 

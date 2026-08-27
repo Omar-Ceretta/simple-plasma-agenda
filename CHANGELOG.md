@@ -25,6 +25,7 @@
 - Validato end-to-end anche su **Kubuntu 26.04 LTS / Plasma 6.6.4**, partendo senza KDE PIM/Akonadi e ricostruendo lo stack tramite `apt`: **PASS**.
 - Corretto il percorso `zypper` su **openSUSE Tumbleweed**: prima di installare KDE PIM l'installer esegue `zypper refresh` + `zypper dist-upgrade`, previa conferma, per mantenere coerente lo snapshot rolling.
 - Validato end-to-end anche su **openSUSE Tumbleweed / Plasma 6.7.4**, partendo senza KDE PIM/Akonadi e ricostruendo lo stack tramite `zypper`: **PASS**.
+- Validato end-to-end anche su **openSUSE Leap 16.0 / Plasma 6.4.2**, partendo senza KDE PIM/Akonadi e usando il normale percorso `zypper` stabile, senza `dist-upgrade` preventivo: **PASS**.
 - Reso più evidente il completamento dell’installer e aggiornato il percorso Plasma corrente per aggiungere il widget: **Entra in modalità di modifica → Aggiungi o gestisci oggetti → Simple Plasma Agenda → Esci dalla modalità di modifica**.
 
 ### 0.2.20 — 2026-08-26
@@ -75,6 +76,7 @@
 - Also validated end-to-end on **Kubuntu 26.04 LTS / Plasma 6.6.4**, starting without KDE PIM/Akonadi and rebuilding the stack through `apt`: **PASS**.
 - Fixed the `zypper` path on **openSUSE Tumbleweed**: before installing KDE PIM, the installer runs `zypper refresh` + `zypper dist-upgrade`, with confirmation first, to keep the rolling snapshot consistent.
 - Also validated end-to-end on **openSUSE Tumbleweed / Plasma 6.7.4**, starting without KDE PIM/Akonadi and rebuilding the stack through `zypper`: **PASS**.
+- Also validated end-to-end on **openSUSE Leap 16.0 / Plasma 6.4.2**, starting without KDE PIM/Akonadi and using the normal stable `zypper` path, with no preventive `dist-upgrade`: **PASS**.
 - Made installer completion more prominent and updated the current Plasma path for adding the widget: **Enter Edit Mode → Add or Manage Widgets → Simple Plasma Agenda → Exit Edit Mode**.
 
 ### 0.2.20 — 2026-08-26
