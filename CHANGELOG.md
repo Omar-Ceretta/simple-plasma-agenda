@@ -2,37 +2,23 @@
 
 ## Italiano
 
-### 0.2.21 — 2026-08-26
+### 0.2.21 — widget 2026-08-26; installer/documentazione aggiornati fino al 2026-08-27
 
-- Dimensione iniziale ridotta a **19 × 21** unità Kirigami.
-- Coefficienti responsive ricalibrati per mantenere invariata la resa tipografica predefinita.
-- Tooltip del titolo aggiornato a: **«Clicca su un evento per aprirne il giorno su KOrganizer»**.
-- PASS completo su TUXEDO OS Debian-based / Plasma 6.7.2 e KDE neon User Edition 24.04 / Plasma 6.7.4.
-- Aggiunto `scripts/install.sh`: installer assistito con rilevamento `dnf` / `apt` / `pacman` / `zypper`, consenso prima di `sudo` e checkpoint manuale prima dell’installazione del plasmoide.
-- `install.sh` reso utilizzabile anche come script standalone: fuori dal repository scarica automaticamente `Simple-Plasma-Agenda.plasmoid` dall'ultima release GitHub.
-- `scripts/package.sh` genera sia l'artefatto versionato sia il nome stabile `Simple-Plasma-Agenda.plasmoid` destinato alle release.
-- README ampliato con installazione rapida via `curl`/`wget` e procedura passo passo per configurare Google Calendar in KOrganizer, con Merkuro indicato come alternativa.
-- Aggiunto un selettore grafico temporaneo delle collection Akonadi, eseguito tramite `plasmawindowed`, per scegliere quali calendari fornire a `pimevents` senza usare l'Orologio digitale.
-- Aggiunto `install.sh --calendars` per riaprire il selettore in seguito; la configurazione viene salvata con KConfig (`PIMEventsPlugin/calendars`) senza chiamare `PimCalendarsModel::saveConfig()`.
-- Corretto il percorso Google in KOrganizer: **Aggiungi → Google Groupware → Configura → Applica/OK**.
-- L'installer assistito ora usa un **wizard in 5 passaggi**, apre automaticamente KOrganizer e mostra le istruzioni per l'account solo quando necessarie, evitando il precedente blocco di testo unico.
-- Il passo KOrganizer è stato reso più guidato e ora verifica che l'applicazione resti realmente in esecuzione prima di dichiararne l'apertura.
-- Aggiunto un controllo runtime di KOrganizer: se i pacchetti risultano installati ma le librerie di sistema non sono allineate, l'installer propone un aggiornamento completo tramite il package manager rilevato, previa conferma.
-- Dopo una modifica alla selezione `pimevents`, l'installer propone un reload rapido di Plasma (`plasma-plasmashell.service`, con fallback `plasmashell --replace`) per applicare subito la nuova lista senza reboot.
-- Rimossi dall'output normale dell'installer i riferimenti non necessari agli eventi PIM dell'Orologio digitale.
-- Validato su Fedora KDE 44 il flusso assistito completo da VM ripulita da KDE PIM/Akonadi: configurazione Google, selettore Akonadi, reload automatico di Plasma solo quando necessario, installazione SPA e visualizzazione immediata degli eventi: **PASS**.
-- Validato end-to-end anche su **Arch Linux / Plasma 6.7.4**, partendo senza KDE PIM/Akonadi e reinstallando lo stack tramite `pacman -Syu --needed`: **PASS**.
-- Validato end-to-end anche su **Kubuntu 26.04 LTS / Plasma 6.6.4**, partendo senza KDE PIM/Akonadi e ricostruendo lo stack tramite `apt`: **PASS**.
-- Corretto il percorso `zypper` su **openSUSE Tumbleweed**: prima di installare KDE PIM l'installer esegue `zypper refresh` + `zypper dist-upgrade`, previa conferma, per mantenere coerente lo snapshot rolling.
-- Validato end-to-end anche su **openSUSE Tumbleweed / Plasma 6.7.4**, partendo senza KDE PIM/Akonadi e ricostruendo lo stack tramite `zypper`: **PASS**.
-- Validato end-to-end anche su **openSUSE Leap 16.0 / Plasma 6.4.2**, partendo senza KDE PIM/Akonadi e usando il normale percorso `zypper` stabile, senza `dist-upgrade` preventivo: **PASS**.
-- Reso più evidente il completamento dell’installer e aggiornato il percorso Plasma corrente per aggiungere il widget: **Entra in modalità di modifica → Aggiungi o gestisci oggetti → Simple Plasma Agenda → Esci dalla modalità di modifica**.
+- Dimensione iniziale ridotta a **19 × 21** unità Kirigami, con coefficienti responsive ricalibrati.
+- Tooltip del titolo aggiornato a **«Clicca su un evento per aprirne il giorno su KOrganizer»**.
+- Aggiunto `scripts/install.sh`, utilizzabile dal repository o come script standalone: rileva `dnf` / `apt` / `pacman` / `zypper`, chiede conferma prima di `sudo` e scarica l'asset stabile della release quando necessario.
+- L'installer usa un wizard in 5 passaggi, verifica realmente KOrganizer, apre l'app per la configurazione dell'account e propone un aggiornamento completo se rileva librerie di sistema non allineate.
+- Aggiunto un selettore temporaneo delle collection Akonadi (`--calendars`) che configura `PIMEventsPlugin/calendars` senza interrogare il database Akonadi; quando la selezione cambia, Plasma viene ricaricato solo su conferma e senza reboot.
+- Su **openSUSE Tumbleweed** l'installer esegue `zypper refresh` + `zypper dist-upgrade` prima dell'installazione PIM; su **Leap** usa il normale percorso `zypper` stabile.
+- `scripts/package.sh` genera sia l'artefatto versionato sia `Simple-Plasma-Agenda.plasmoid` con nome stabile per le release.
+- Installer validato end-to-end su **Fedora KDE 44, Arch Linux, Kubuntu 26.04, openSUSE Tumbleweed e openSUSE Leap 16.0**; smoke test PASS su **TUXEDO OS Debian base**. Il plasmoide 0.2.21 è inoltre PASS su **KDE neon User Edition 24.04**.
+- Documentazione snellita e riallineata al flusso di installazione realmente testato.
 
 ### 0.2.20 — 2026-08-26
 
 - Prima riduzione della geometria iniziale da **22 × 26** a **21 × 24**.
 - Versione in `metadata.json` riallineata alla versione di sviluppo.
-- Build intermedia, sostituita dalla 0.2.21 prima del test TUXEDO.
+- Build intermedia, sostituita dalla 0.2.21.
 
 ### 0.2.19 — 2026-08-25
 
@@ -53,37 +39,23 @@
 
 ## English
 
-### 0.2.21 — 2026-08-26
+### 0.2.21 — widget 2026-08-26; installer/docs updated through 2026-08-27
 
-- Reduced the initial size to **19 × 21** Kirigami grid units.
-- Recalibrated responsive coefficients to preserve the default typography.
-- Updated the title tooltip to: **“Clicca su un evento per aprirne il giorno su KOrganizer”**.
-- Full PASS on TUXEDO OS Debian-based / Plasma 6.7.2 and KDE neon User Edition 24.04 / Plasma 6.7.4.
-- Added `scripts/install.sh`: assisted installer with `dnf` / `apt` / `pacman` / `zypper` detection, confirmation before `sudo`, and a manual checkpoint before widget installation.
-- Made `install.sh` usable as a standalone script: outside a repository checkout it automatically downloads `Simple-Plasma-Agenda.plasmoid` from the latest GitHub release.
-- `scripts/package.sh` now creates both the versioned artifact and the stable `Simple-Plasma-Agenda.plasmoid` release asset.
-- Expanded the README with quick `curl`/`wget` installation and step-by-step Google Calendar setup in KOrganizer, with Merkuro documented as an alternative.
-- Added a temporary graphical Akonadi collection selector, run through `plasmawindowed`, to choose which calendars are exposed to `pimevents` without using the Digital Clock.
-- Added `install.sh --calendars` to reopen the selector later; configuration is stored through KConfig (`PIMEventsPlugin/calendars`) without calling `PimCalendarsModel::saveConfig()`.
-- Corrected the Google setup path in KOrganizer: **Add → Google Groupware → Configure → Apply/OK**.
-- The assisted installer now uses a **5-step wizard**, opens KOrganizer automatically, and shows account instructions only when needed instead of presenting one long checkpoint block.
-- The KOrganizer step is now more guided and verifies that the application actually stays running before reporting a successful launch.
-- Added a KOrganizer runtime check: if packages are installed but system libraries are out of sync, the installer offers a full update through the detected package manager, with confirmation first.
-- After a changed `pimevents` selection, the installer offers a quick Plasma reload (`plasma-plasmashell.service`, with `plasmashell --replace` fallback) so the new list takes effect immediately without a reboot.
-- Removed unnecessary Digital Clock PIM Events references from normal installer output.
-- Validated the full assisted flow on Fedora KDE 44 from a VM cleaned of KDE PIM/Akonadi: Google setup, Akonadi selector, automatic Plasma reload only when required, SPA installation, and immediate event display: **PASS**.
-- Also validated end-to-end on **Arch Linux / Plasma 6.7.4**, starting without KDE PIM/Akonadi and reinstalling the stack through `pacman -Syu --needed`: **PASS**.
-- Also validated end-to-end on **Kubuntu 26.04 LTS / Plasma 6.6.4**, starting without KDE PIM/Akonadi and rebuilding the stack through `apt`: **PASS**.
-- Fixed the `zypper` path on **openSUSE Tumbleweed**: before installing KDE PIM, the installer runs `zypper refresh` + `zypper dist-upgrade`, with confirmation first, to keep the rolling snapshot consistent.
-- Also validated end-to-end on **openSUSE Tumbleweed / Plasma 6.7.4**, starting without KDE PIM/Akonadi and rebuilding the stack through `zypper`: **PASS**.
-- Also validated end-to-end on **openSUSE Leap 16.0 / Plasma 6.4.2**, starting without KDE PIM/Akonadi and using the normal stable `zypper` path, with no preventive `dist-upgrade`: **PASS**.
-- Made installer completion more prominent and updated the current Plasma path for adding the widget: **Enter Edit Mode → Add or Manage Widgets → Simple Plasma Agenda → Exit Edit Mode**.
+- Reduced the initial size to **19 × 21** Kirigami grid units and recalibrated responsive coefficients.
+- Updated the title tooltip to **“Clicca su un evento per aprirne il giorno su KOrganizer”**.
+- Added `scripts/install.sh`, usable from a checkout or standalone: it detects `dnf` / `apt` / `pacman` / `zypper`, asks before `sudo`, and downloads the stable release asset when needed.
+- The installer uses a 5-step wizard, performs a real KOrganizer runtime check, opens the app for account setup, and offers a full system update when it detects out-of-sync libraries.
+- Added a temporary Akonadi collection selector (`--calendars`) that configures `PIMEventsPlugin/calendars` without querying the Akonadi database; when the selection changes, Plasma is reloaded only after confirmation and without a reboot.
+- On **openSUSE Tumbleweed** the installer runs `zypper refresh` + `zypper dist-upgrade` before PIM installation; on **Leap** it uses the normal stable `zypper` path.
+- `scripts/package.sh` now creates both the versioned artifact and the stable `Simple-Plasma-Agenda.plasmoid` release name.
+- Installer validated end-to-end on **Fedora KDE 44, Arch Linux, Kubuntu 26.04, openSUSE Tumbleweed and openSUSE Leap 16.0**; smoke test PASS on **TUXEDO OS, Debian base**. The 0.2.21 widget is also PASS on **KDE neon User Edition 24.04**.
+- Documentation was trimmed and aligned with the installation flow actually tested.
 
 ### 0.2.20 — 2026-08-26
 
 - First reduction of the initial geometry from **22 × 26** to **21 × 24**.
 - Aligned `metadata.json` with the development version.
-- Intermediate build superseded by 0.2.21 before the TUXEDO test.
+- Intermediate build superseded by 0.2.21.
 
 ### 0.2.19 — 2026-08-25
 

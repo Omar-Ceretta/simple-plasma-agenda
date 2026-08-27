@@ -1,61 +1,43 @@
-# Simple Plasma Agenda — Testing
+# Test / Testing
 
 ## Italiano
 
-Questo file registra solo **test realmente eseguiti**. Non è un elenco di piattaforme promesse o garantite.
+Questo file registra solo **test realmente eseguiti** sulla versione **0.2.21**. Non è una promessa di supporto per ogni futura combinazione di pacchetti.
 
-Versione di sviluppo corrente: **0.2.21**.
+### Ambienti provati
 
-## Ambienti provati
-
-| Ambiente | Plasma | Build SPA provata | Esito |
+| Ambiente | Plasma | Installer | Esito |
 | --- | --- | --- | --- |
-| Fedora KDE 44 | Plasma 6 | 0.2.21 | PASS |
-| Kubuntu 26.04 LTS (Ubuntu 26.04 base) | 6.6.4 | 0.2.21 | PASS |
-| Arch Linux + KDE | 6.7.4 | 0.2.21 | PASS |
-| openSUSE Tumbleweed | 6.7.4 | 0.2.21 | PASS |
-| openSUSE Leap 16.0 | 6.4.2 | 0.2.21 | PASS |
-| TUXEDO OS Debian base (`forky`) | 6.7.2 | 0.2.21 | PASS |
-| KDE neon User Edition 24.04 (`noble`) | 6.7.4 | 0.2.21 | PASS |
+| Fedora KDE 44 | 6.6.4 | E2E (`dnf`) | PASS |
+| Kubuntu 26.04 LTS | 6.6.4 | E2E (`apt`) | PASS |
+| Arch Linux + KDE | 6.7.4 | E2E (`pacman`) | PASS |
+| openSUSE Tumbleweed | 6.7.4 | E2E (`zypper`) | PASS |
+| openSUSE Leap 16.0 | 6.4.2 | E2E (`zypper`) | PASS |
+| TUXEDO OS Debian base (`forky`) | 6.7.2 | Smoke (`apt`) | PASS |
+| KDE neon User Edition 24.04 (`noble`) | 6.7.4 | — | PASS |
 
-## Controlli coperti
+**E2E**: test da sistema senza KDE PIM/Akonadi, fino a KOrganizer, selezione Akonadi, reload Plasma e installazione SPA.  
+**Smoke**: stack PIM già presente; verificato il percorso dell'installer, la selezione esistente e l'installazione SPA.
 
-Nel corso dei test sono stati verificati, a seconda dell'ambiente:
+### Controlli coperti
 
-- installazione delle dipendenze KDE PIM/Akonadi;
-- presenza del plugin Plasma `pimevents`;
-- calendario Google tramite risorsa Akonadi;
-- eventi visibili in KOrganizer;
-- stessi eventi visibili in Simple Plasma Agenda;
-- refresh Google manuale;
-- refresh Google automatico ogni 5 minuti;
-- prima sincronizzazione automatica ritardata di 20 secondi;
-- clic/attivazione evento → giorno corretto in KOrganizer;
-- hover e navigazione da tastiera di base;
-- impostazioni grafiche e intervalli temporali;
-- logout/login con Akonadi ancora operativo;
-- geometria iniziale **19 × 21** validata sulla 0.2.21.
+A seconda dell'ambiente sono stati verificati:
 
-## Limiti intenzionali da tenere presenti nei test
+- eventi Akonadi visibili in KOrganizer e in Simple Plasma Agenda;
+- selezione delle collection tramite `install.sh --calendars`;
+- reload di Plasma solo quando la selezione cambia;
+- refresh Google manuale e automatico;
+- apertura del giorno corretto in KOrganizer;
+- intervalli 1 / 3 / 5 / 7 / 14 / 21 / 28 giorni e impostazioni grafiche;
+- hover, tastiera e attenuazione degli eventi conclusi;
+- geometria iniziale **19 × 21**;
+- persistenza di Akonadi dopo logout/login nei test completi.
 
-- La selezione delle sorgenti calendario **non** appartiene al pannello del plasmoide: account e risorse restano ad Akonadi/KOrganizer; l'installer può inizializzare la lista globale di `pimevents`.
-- Il clic apre il **giorno** in KOrganizer, non il singolo editor dell'evento.
-- Il refresh forzato riguarda soltanto `akonadi_google_resource_*`.
-- Se KOrganizer non vede gli eventi, il problema va risolto prima nel livello Akonadi/PIM. Se KOrganizer li vede ma SPA no, va verificata la selezione globale di `pimevents`.
+Su openSUSE Tumbleweed è stato validato il riallineamento rolling con `zypper refresh` + `zypper dist-upgrade`; su Leap 16.0 è stato validato il normale percorso `zypper` senza `dist-upgrade` preventivo.
 
-## Validazione installer assistito
+Durante il test Fedora è stato riprodotto anche un KOrganizer non avviabile per librerie non allineate. L'installer ora rileva questo stato e propone un aggiornamento completo; il ramo automatico di recupero non è stato rieseguito end-to-end dopo la modifica.
 
-Su Fedora KDE 44 è stato eseguito un test end-to-end da VM ripulita da KDE PIM/Akonadi: installazione dipendenze, avvio Akonadi, configurazione Google in KOrganizer, selettore Akonadi, scrittura di `PIMEventsPlugin/calendars=27`, reload automatico di Plasma quando necessario e installazione del `.plasmoid`: **PASS**. È stato inoltre verificato che il reload non venga proposto quando la selezione non cambia e che SPA mostri subito gli eventi dopo una nuova selezione, senza reboot. Durante il test è stato riprodotto anche un caso di stack KDE/PIM non allineato; il relativo controllo runtime e la proposta di aggiornamento sono ora presenti nell'installer, ma quel ramo di recupero non è stato rieseguito end-to-end dopo la modifica.
-
-Su Arch Linux / Plasma 6.7.4 è stato eseguito lo stesso test end-to-end partendo da una VM ripulita da KDE PIM/Akonadi: installazione tramite `pacman -Syu --needed`, avvio di KOrganizer, configurazione Google, selezione Akonadi, reload di Plasma quando richiesto e installazione finale di SPA: **PASS**. Al termine Akonadi risultava operativo, `PIMEventsPlugin/calendars=27` era salvato e il plasmoide installato correttamente.
-
-Su Kubuntu 26.04 LTS / Plasma 6.6.4 è stato eseguito il test end-to-end partendo senza KDE PIM/Akonadi: installazione tramite `apt`, avvio di KOrganizer, configurazione Google, selezione Akonadi, reload di Plasma e installazione finale di SPA: **PASS**. Al termine Akonadi risultava operativo, la collection scelta era salvata in `PIMEventsPlugin/calendars` e il plasmoide installato correttamente.
-
-Su openSUSE Tumbleweed / Plasma 6.7.4 è stato eseguito il test end-to-end partendo senza KDE PIM/Akonadi: riallineamento dello snapshot rolling con `zypper refresh` + `zypper dist-upgrade`, installazione delle dipendenze, avvio di KOrganizer, configurazione Google, selezione Akonadi, reload di Plasma e installazione finale di SPA: **PASS**.
-
-Su openSUSE Leap 16.0 / Plasma 6.4.2 è stato eseguito il test end-to-end partendo senza KDE PIM/Akonadi: installazione tramite il normale percorso `zypper` stabile, senza `dist-upgrade` preventivo, avvio di KOrganizer, configurazione Google, selezione Akonadi, reload di Plasma e installazione finale di SPA: **PASS**.
-
-## Preflight minimo
+### Preflight minimo
 
 ```bash
 cat /etc/os-release
@@ -69,60 +51,42 @@ find /usr -type f -path '*/plasmacalendarplugins/pimevents.so' -print 2>/dev/nul
 
 ## English
 
-This file records only **tests that were actually performed**. It is not a list of promised or guaranteed platforms.
+This file records only **tests that were actually performed** on version **0.2.21**. It is not a promise of support for every future package combination.
 
-Current development version: **0.2.21**.
+### Tested environments
 
-## Tested environments
-
-| Environment | Plasma | SPA build tested | Result |
+| Environment | Plasma | Installer | Result |
 | --- | --- | --- | --- |
-| Fedora KDE 44 | Plasma 6 | 0.2.21 | PASS |
-| Kubuntu 26.04 LTS (Ubuntu 26.04 base) | 6.6.4 | 0.2.21 | PASS |
-| Arch Linux + KDE | 6.7.4 | 0.2.21 | PASS |
-| openSUSE Tumbleweed | 6.7.4 | 0.2.21 | PASS |
-| openSUSE Leap 16.0 | 6.4.2 | 0.2.21 | PASS |
-| TUXEDO OS Debian base (`forky`) | 6.7.2 | 0.2.21 | PASS |
-| KDE neon User Edition 24.04 (`noble`) | 6.7.4 | 0.2.21 | PASS |
+| Fedora KDE 44 | 6.6.4 | E2E (`dnf`) | PASS |
+| Kubuntu 26.04 LTS | 6.6.4 | E2E (`apt`) | PASS |
+| Arch Linux + KDE | 6.7.4 | E2E (`pacman`) | PASS |
+| openSUSE Tumbleweed | 6.7.4 | E2E (`zypper`) | PASS |
+| openSUSE Leap 16.0 | 6.4.2 | E2E (`zypper`) | PASS |
+| TUXEDO OS, Debian base (`forky`) | 6.7.2 | Smoke (`apt`) | PASS |
+| KDE neon User Edition 24.04 (`noble`) | 6.7.4 | — | PASS |
 
-## Covered checks
+**E2E**: tested from a system without KDE PIM/Akonadi through KOrganizer, Akonadi selection, Plasma reload and SPA installation.  
+**Smoke**: PIM stack already present; installer path, existing selection and SPA installation were verified.
 
-Across the tested environments, the following were verified as applicable:
+### Covered checks
 
-- KDE PIM/Akonadi dependency installation;
-- presence of Plasma's `pimevents` plugin;
-- Google Calendar through an Akonadi resource;
-- events visible in KOrganizer;
-- the same events visible in Simple Plasma Agenda;
-- manual Google refresh;
-- automatic Google refresh every 5 minutes;
-- delayed first automatic sync after 20 seconds;
-- event click/activation → correct day in KOrganizer;
-- hover and basic keyboard navigation;
-- appearance settings and date ranges;
-- logout/login with Akonadi still operational;
-- initial **19 × 21** geometry validated on 0.2.21.
+As applicable across the environments above:
 
-## Intentional limitations relevant to testing
+- Akonadi events visible in KOrganizer and Simple Plasma Agenda;
+- collection selection through `install.sh --calendars`;
+- Plasma reload only when the selection changes;
+- manual and automatic Google refresh;
+- correct day opened in KOrganizer;
+- 1 / 3 / 5 / 7 / 14 / 21 / 28 day ranges and appearance settings;
+- hover, keyboard interaction and dimming of completed events;
+- initial **19 × 21** geometry;
+- Akonadi persistence after logout/login in the full tests.
 
-- Calendar-source selection does **not** belong to the widget settings: accounts/resources stay in Akonadi/KOrganizer, while the installer may initialize the global `pimevents` list.
-- Clicking opens the event's **day** in KOrganizer, not the individual event editor.
-- Forced refresh is limited to `akonadi_google_resource_*`.
-- If KOrganizer cannot see the events, solve the Akonadi/PIM layer first. If KOrganizer can see them but SPA cannot, check the global `pimevents` selection.
+On openSUSE Tumbleweed the rolling alignment through `zypper refresh` + `zypper dist-upgrade` was validated; on Leap 16.0 the normal stable `zypper` path was validated without a preventive `dist-upgrade`.
 
-## Assisted-installer validation
+The Fedora test also reproduced a KOrganizer runtime failure caused by out-of-sync libraries. The installer now detects that state and offers a full system update; that automatic recovery branch was not re-run end-to-end after the change.
 
-Fedora KDE 44 was tested end-to-end from a VM cleaned of KDE PIM/Akonadi: dependency installation, Akonadi startup, Google setup in KOrganizer, Akonadi selector, writing `PIMEventsPlugin/calendars=27`, automatic Plasma reload when required, and `.plasmoid` installation: **PASS**. It was also verified that no reload is offered when the selection is unchanged and that SPA shows events immediately after a changed selection, without a reboot. An out-of-sync KDE/PIM stack was also reproduced during testing; the related runtime check and update offer are now present in the installer, but that recovery branch has not been re-run end-to-end after the change.
-
-Arch Linux / Plasma 6.7.4 was tested through the same end-to-end flow from a VM cleaned of KDE PIM/Akonadi: installation through `pacman -Syu --needed`, KOrganizer startup, Google setup, Akonadi selection, Plasma reload when required, and final SPA installation: **PASS**. At completion Akonadi was running, `PIMEventsPlugin/calendars=27` was stored, and the widget was installed correctly.
-
-Kubuntu 26.04 LTS / Plasma 6.6.4 was tested end-to-end starting without KDE PIM/Akonadi: installation through `apt`, KOrganizer startup, Google setup, Akonadi selection, Plasma reload, and final SPA installation: **PASS**. At completion Akonadi was running, the selected collection was stored in `PIMEventsPlugin/calendars`, and the widget was installed correctly.
-
-openSUSE Tumbleweed / Plasma 6.7.4 was tested end-to-end starting without KDE PIM/Akonadi: rolling-snapshot alignment through `zypper refresh` + `zypper dist-upgrade`, dependency installation, KOrganizer startup, Google setup, Akonadi selection, Plasma reload, and final SPA installation: **PASS**.
-
-openSUSE Leap 16.0 / Plasma 6.4.2 was tested end-to-end starting without KDE PIM/Akonadi: installation through the normal stable `zypper` path, with no preventive `dist-upgrade`, KOrganizer startup, Google setup, Akonadi selection, Plasma reload, and final SPA installation: **PASS**.
-
-## Minimal preflight
+### Minimal preflight
 
 ```bash
 cat /etc/os-release

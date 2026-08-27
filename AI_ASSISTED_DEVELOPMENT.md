@@ -1,4 +1,4 @@
-# AI-assisted development / Sviluppo assistito da AI
+# Sviluppo assistito da AI / AI-assisted development
 
 ## Italiano
 
