@@ -1,0 +1,4 @@
+/dist/
+*.plasmoid
+.DS_Store
+*~

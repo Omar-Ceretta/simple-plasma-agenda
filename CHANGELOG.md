@@ -2,16 +2,20 @@
 
 ## Italiano
 
-### 0.2.22-dev1 — in sviluppo
+### 0.2.22 — 2026-08-27
 
+- Rifiniti gli spazi della pagina **Aspetto**: messaggio introduttivo con margini e opzioni booleane leggermente rientrate.
+- La sezione **Fonte del calendario** mostra ora un comando concreto e selezionabile: `./scripts/install.sh --calendars`.
 - Nuovo default del raggio degli angoli: **12 px**.
 - Titolo del widget opzionale; quando è nascosto resta la sola azione di refresh nella testata compatta.
 - Sfondo traslucido con tre livelli: **Bassa / Media / Alta** trasparenza.
 - Evidenziazione opzionale degli eventi che iniziano entro 15 minuti (colore neutro KDE) e di quelli in corso (colore positivo KDE), senza animazioni.
+- Avviso sonoro discreto opzionale a **T−15 minuti** per gli eventi con orario: una sola riproduzione, nessun recupero tardivo dopo riavvio/sospensione e nessun suono per eventi “tutto il giorno”.
 - Separatori settimanali ora opzionali.
 - Tooltip del titolo traducibile e abbreviato a **«Clicca su un evento per aprirlo in KOrganizer»**.
 - Rimossi i riferimenti al vecchio percorso di configurazione esterno dal widget e dal fallback dell'installer.
 - Backend Akonadi/pimevents, sincronizzazione e apertura di KOrganizer invariati.
+- Modifiche della 0.2.22 validate su **Fedora KDE 44 / Plasma 6.6.4**; nessun nuovo percorso distro-specifico introdotto.
 
 ### 0.2.21 — widget 2026-08-26; installer/documentazione aggiornati fino al 2026-08-27
 
@@ -50,16 +54,20 @@
 
 ## English
 
-### 0.2.22-dev1 — in development
+### 0.2.22 — 2026-08-27
 
+- Refined **Appearance** page spacing: the introductory message now has margins and boolean options are slightly indented.
+- **Calendar source** now shows a concrete, selectable command: `./scripts/install.sh --calendars`.
 - New default corner radius: **12 px**.
 - Optional widget title; when hidden, only the refresh action remains in the compact header.
 - Translucent background now offers **Low / Medium / High** transparency.
 - Optional semantic highlighting for events starting within 15 minutes (KDE neutral color) and events in progress (KDE positive color), with no animation.
+- Optional subtle **T−15 minute** sound for timed events: one playback only, no late catch-up after restart/suspend, and no sound for all-day events.
 - Week separators are now optional.
 - The title tooltip is translatable and shortened to **“Click an event to open it in KOrganizer”**.
 - Removed references to the old external configuration path from the widget and the installer fallback.
 - Akonadi/pimevents backend, synchronization and KOrganizer opening logic are unchanged.
+- 0.2.22 changes validated on **Fedora KDE 44 / Plasma 6.6.4**; no new distro-specific path was introduced.
 
 ### 0.2.21 — widget 2026-08-26; installer/docs updated through 2026-08-27
 

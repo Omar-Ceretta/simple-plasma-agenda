@@ -6,7 +6,7 @@
 
 È volutamente un'agenda, non un calendario completo: niente vista mensile, niente gestione degli account e niente selettore permanente delle sorgenti nel widget.
 
-Versione di sviluppo: **0.2.22-dev1**. Ultima release stabile e validata: **0.2.21**.
+Release corrente: **0.2.22**.
 
 ### Caratteristiche
 
@@ -16,6 +16,7 @@ Versione di sviluppo: **0.2.22-dev1**. Ultima release stabile e validata: **0.2.
 - sfondo solido o traslucido con tre livelli di trasparenza, colori di sistema/chiari/scuri;
 - titolo opzionale, densità Compact / Normal / Airy e testo Small / Normal / Large;
 - eventi imminenti/in corso evidenziati con colori semantici KDE; eventi conclusi attenuati dopo l'orario reale di fine;
+- avviso sonoro discreto opzionale 15 minuti prima degli eventi con orario, disattivato di default;
 - hover, focus da tastiera e attivazione con Invio/Spazio;
 - clic su un evento → apertura del relativo **giorno** in KOrganizer;
 - refresh manuale delle risorse Google Akonadi;
@@ -172,7 +173,7 @@ Lo sviluppo è stato svolto con assistenza di OpenAI ChatGPT sotto direzione e v
 
 It is intentionally an agenda, not a full calendar: no month view, no account management and no permanent calendar-source selector inside the widget.
 
-Development version: **0.2.22-dev1**. Latest stable and validated release: **0.2.21**.
+Current release: **0.2.22**.
 
 ### Features
 
@@ -182,6 +183,7 @@ Development version: **0.2.22-dev1**. Latest stable and validated release: **0.2
 - solid or translucent background with three transparency levels, system/light/dark colors;
 - optional title, Compact / Normal / Airy density and Small / Normal / Large event text;
 - events starting soon/in progress use KDE semantic colors; completed events dim after their actual end time;
+- optional subtle sound 15 minutes before timed events, disabled by default;
 - hover, keyboard focus and Enter/Space activation;
 - click an event → open its **day** in KOrganizer;
 - manual refresh for Google Akonadi resources;
