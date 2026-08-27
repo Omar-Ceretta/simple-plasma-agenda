@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Simple Plasma Agenda 0.2.21\n"
+"Project-Id-Version: Simple Plasma Agenda 0.2.22-dev1\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -12,6 +12,75 @@ msgstr "Agenda"
 
 msgid "Appearance"
 msgstr "Aspetto"
+
+msgid "Solid uses the selected color scheme. Translucent lets the desktop show through and offers three transparency levels."
+msgstr "Solido usa lo schema di colori selezionato. Traslucido lascia intravedere il desktop e offre tre livelli di trasparenza."
+
+msgid "Background:"
+msgstr "Sfondo:"
+
+msgid "Translucent"
+msgstr "Traslucido"
+
+msgid "Solid"
+msgstr "Solido"
+
+msgid "Transparency:"
+msgstr "Trasparenza:"
+
+msgid "Low"
+msgstr "Bassa"
+
+msgid "Medium"
+msgstr "Media"
+
+msgid "High"
+msgstr "Alta"
+
+msgid "Colors:"
+msgstr "Colori:"
+
+msgid "Dark"
+msgstr "Scuro"
+
+msgid "Light"
+msgstr "Chiaro"
+
+msgid "Follow system"
+msgstr "Segui il sistema"
+
+msgid "Density:"
+msgstr "Densità:"
+
+msgid "Compact"
+msgstr "Compatta"
+
+msgid "Normal"
+msgstr "Normale"
+
+msgid "Airy"
+msgstr "Ariosa"
+
+msgid "Event text size:"
+msgstr "Dimensione testo eventi:"
+
+msgid "Small"
+msgstr "Piccola"
+
+msgid "Large"
+msgstr "Grande"
+
+msgid "Corner radius (px):"
+msgstr "Raggio degli angoli (px):"
+
+msgid "Show title"
+msgstr "Mostra titolo"
+
+msgid "Show weekly dividers"
+msgstr "Mostra separatori settimanali"
+
+msgid "Highlight events starting within 15 minutes or in progress"
+msgstr "Evidenzia gli eventi che iniziano entro 15 minuti o sono in corso"
 
 msgid "First day of week:"
 msgstr "Primo giorno della settimana:"
@@ -52,68 +121,11 @@ msgstr "Forza la sincronizzazione di Google Calendar tramite Akonadi ogni 5 minu
 msgid "Calendar source"
 msgstr "Fonte del calendario"
 
-msgid "Simple Plasma Agenda displays events exposed by KDE PIM/Akonadi. This can include Google, CalDAV/Nextcloud, iCalendar and other sources configured in Akonadi."
-msgstr "Simple Plasma Agenda mostra gli eventi esposti da KDE PIM/Akonadi. Possono quindi comparire calendari Google, CalDAV/Nextcloud, iCalendar e altre sorgenti configurate in Akonadi."
+msgid "Simple Plasma Agenda displays calendars exposed by KDE PIM/Akonadi. To change which calendars are shown, run the installer again with --calendars."
+msgstr "Simple Plasma Agenda mostra i calendari esposti da KDE PIM/Akonadi. Per cambiare quali calendari visualizzare, esegui di nuovo l'installer con --calendars."
 
-msgid "Calendar and account selection is intentionally not changed from this widget. No additional login or Google API project is required by Simple Plasma Agenda."
-msgstr "La selezione di account e calendari non viene modificata da questo widget. Simple Plasma Agenda non richiede né un nuovo accesso né la creazione di un progetto Google API."
-
-msgid "The desktop refresh button currently forces Akonadi Google resources to synchronize immediately. Automatic synchronization can do the same every 5 minutes; other Akonadi sources remain visible but use their own synchronization mechanisms."
-msgstr "Il pulsante di aggiornamento sul desktop forza al momento la sincronizzazione immediata delle risorse Google di Akonadi. La sincronizzazione automatica può fare lo stesso ogni 5 minuti; le altre sorgenti Akonadi restano visibili ma usano i propri meccanismi di sincronizzazione."
-
-msgid "Changing the enabled PIM calendars from some Plasma 6 widgets can crash plasmashell. For this reason this widget does not provide calendar-selection checkboxes."
-msgstr "In alcuni widget di Plasma 6, modificare i calendari PIM abilitati può causare un arresto di plasmashell. Per questo Simple Plasma Agenda non offre caselle di selezione dei calendari."
-
-msgid "Akonadi data are shared with Plasma's Digital Clock, so a synchronization requested here updates its agenda too."
-msgstr "I dati di Akonadi sono condivisi con l'Orologio digitale di Plasma: una sincronizzazione richiesta da qui aggiorna quindi anche la sua agenda."
-
-msgid "Solid follows the Plasma color scheme and is the recommended default. Translucent keeps the same colors with a slightly transparent background."
-msgstr "Solido segue lo schema di colori di Plasma ed è l'impostazione consigliata. Traslucido mantiene gli stessi colori con uno sfondo leggermente trasparente."
-
-msgid "Background:"
-msgstr "Sfondo:"
-
-msgid "Translucent"
-msgstr "Traslucido"
-
-msgid "Solid"
-msgstr "Solido"
-
-msgid "Colors:"
-msgstr "Colori:"
-
-msgid "Dark"
-msgstr "Scuro"
-
-msgid "Light"
-msgstr "Chiaro"
-
-msgid "Follow system"
-msgstr "Segui il sistema"
-
-msgid "Density:"
-msgstr "Densità:"
-
-msgid "Compact"
-msgstr "Compatta"
-
-msgid "Normal"
-msgstr "Normale"
-
-msgid "Airy"
-msgstr "Ariosa"
-
-msgid "Event text size:"
-msgstr "Dimensione testo eventi:"
-
-msgid "Small"
-msgstr "Piccola"
-
-msgid "Large"
-msgstr "Grande"
-
-msgid "Corner radius (px):"
-msgstr "Raggio degli angoli (px):"
+msgid "The refresh button forces Akonadi Google resources to synchronize immediately. Other Akonadi sources keep using their own synchronization mechanisms."
+msgstr "Il pulsante di aggiornamento forza la sincronizzazione immediata delle risorse Google di Akonadi. Le altre sorgenti Akonadi continuano a usare i propri meccanismi di sincronizzazione."
 
 msgid "All day"
 msgstr "Tutto il giorno"
@@ -129,6 +141,9 @@ msgstr "Nessun impegno per oggi."
 
 msgid "No events in the next %1 days."
 msgstr "Nessun impegno nei prossimi %1 giorni."
+
+msgid "Click an event to open it in KOrganizer"
+msgstr "Clicca su un evento per aprirlo in KOrganizer"
 
 msgid "Synchronize Google calendars"
 msgstr "Sincronizza i calendari Google"

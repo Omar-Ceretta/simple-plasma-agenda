@@ -11,8 +11,13 @@ Item {
     property real densityScale: 1.0
     property color cardBg: "#ffffff"
     property real cardBgOpacity: 0.10
+    property real startAt: 0
     property real pastAfter: 0
     property real nowTimestamp: 0
+    property bool isAllDay: false
+    property bool highlightTemporalState: true
+    property color soonColor: "#f0a000"
+    property color inProgressColor: "#2aa36b"
     property color focusColor: "#3daee9"
     property string accessibleDescription: ""
 
@@ -35,6 +40,20 @@ Item {
     }
 
     readonly property bool isPast: pastAfter > 0 && nowTimestamp >= pastAfter
+    readonly property bool isInProgress: highlightTemporalState
+        && !isAllDay
+        && startAt > 0
+        && pastAfter > startAt
+        && nowTimestamp >= startAt
+        && nowTimestamp < pastAfter
+    readonly property bool isStartingSoon: highlightTemporalState
+        && !isAllDay
+        && startAt > nowTimestamp
+        && startAt - nowTimestamp <= 15 * 60 * 1000
+    readonly property bool hasTemporalHighlight: isInProgress || isStartingSoon
+    readonly property color temporalColor: isInProgress ? inProgressColor
+                                                  : isStartingSoon ? soonColor
+                                                  : textColor
 
     readonly property real _pad: Math.round(height * 0.22)
 
@@ -51,6 +70,28 @@ Item {
         Behavior on opacity {
             NumberAnimation { duration: 120 }
         }
+    }
+
+    // A quiet semantic tint gives near/current events a useful glance state
+    // without competing with the collection color bar or using animation.
+    Rectangle {
+        anchors.fill: parent
+        radius: Math.round(card.height * 0.25)
+        color: card.temporalColor
+        opacity: card.hasTemporalHighlight ? (card.isInProgress ? 0.12 : 0.08) : 0
+
+        Behavior on opacity {
+            NumberAnimation { duration: 140 }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        radius: Math.round(card.height * 0.25)
+        color: "transparent"
+        border.width: card.hasTemporalHighlight ? 1 : 0
+        border.color: card.temporalColor
+        opacity: card.hasTemporalHighlight ? 0.42 : 0
     }
 
     // Keyboard focus is deliberately visible but quieter than the day accent.
@@ -82,9 +123,10 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         text: card.title
         Accessible.ignored: true
-        color: card.textColor
+        color: card.hasTemporalHighlight ? card.temporalColor : card.textColor
         opacity: card.isPast ? 0.46 : 1.0
         font.pixelSize: card.fontSize
+        font.weight: card.isInProgress ? Font.DemiBold : Font.Normal
         elide: Text.ElideRight
     }
 
@@ -95,9 +137,10 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         text: card.timeLabel
         Accessible.ignored: true
-        color: card.textColor
-        opacity: card.isPast ? 0.34 : 0.6
+        color: card.hasTemporalHighlight ? card.temporalColor : card.textColor
+        opacity: card.isPast ? 0.34 : (card.hasTemporalHighlight ? 0.95 : 0.6)
         font.pixelSize: Math.round(card.fontSize * 0.85)
+        font.weight: card.hasTemporalHighlight ? Font.DemiBold : Font.Normal
     }
 
     MouseArea {

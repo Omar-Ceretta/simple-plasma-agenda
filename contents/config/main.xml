@@ -10,11 +10,16 @@
         <entry name="styleMode" type="Int"><default>1</default></entry>
         <!-- 0 = dark, 1 = light, 2 = follow Plasma -->
         <entry name="appearance" type="Int"><default>2</default></entry>
-        <entry name="cornerRadius" type="Int"><default>16</default></entry>
+        <!-- 0 = low, 1 = medium, 2 = high; used only for translucent background -->
+        <entry name="transparencyLevel" type="Int"><default>1</default></entry>
+        <entry name="cornerRadius" type="Int"><default>12</default></entry>
         <!-- 0 = compact, 1 = normal, 2 = airy -->
         <entry name="densityMode" type="Int"><default>1</default></entry>
         <!-- 0 = small, 1 = normal, 2 = large -->
         <entry name="eventTextSize" type="Int"><default>1</default></entry>
+        <entry name="showTitle" type="Bool"><default>true</default></entry>
+        <entry name="showWeekDividers" type="Bool"><default>true</default></entry>
+        <entry name="highlightTemporalEvents" type="Bool"><default>true</default></entry>
         <entry name="firstDayOfWeek" type="Int"><default>1</default></entry>
         <!-- Actual number of agenda days shown. -->
         <entry name="lookaheadDays" type="Int"><default>7</default></entry>

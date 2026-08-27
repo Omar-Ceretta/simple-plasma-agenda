@@ -20,6 +20,7 @@ PlasmoidItem {
         id: colors
         styleMode: plasmoid.configuration.styleMode
         appearance: plasmoid.configuration.appearance
+        transparencyLevel: plasmoid.configuration.transparencyLevel
     }
 
     // --- Date state ---
@@ -88,9 +89,11 @@ PlasmoidItem {
         midnightTimer.start();
     }
 
-    // --- Event lookahead ---
+    // --- Event lookahead / visual grouping ---
     readonly property int effectiveLookahead: plasmoid.configuration.lookaheadDays
+    readonly property bool showWeekDividers: plasmoid.configuration.showWeekDividers
     onEffectiveLookaheadChanged: _scheduleRebuildEvents()
+    onShowWeekDividersChanged: _scheduleRebuildEvents()
 
     // --- Plasma Calendar backends ---
     PlasmaCalendar.EventPluginsManager {
@@ -214,6 +217,16 @@ PlasmoidItem {
         return Qt.locale().toString(ev.startDateTime, "HH:mm");
     }
 
+    function _startAtFor(ev) {
+        if (ev.isAllDay) return 0;
+        var start = ev.startDateTime;
+        if (start && typeof start.getTime === "function") {
+            var startMs = start.getTime();
+            if (!isNaN(startMs)) return startMs;
+        }
+        return 0;
+    }
+
     function _pastAfterFor(ev, dayDate) {
         // All-day entries remain active for the whole displayed day.
         if (ev.isAllDay) {
@@ -294,6 +307,7 @@ PlasmoidItem {
                     pillColor: _pillColorFor(ev),
                     isAllDay: ev.isAllDay,
                     timeLabel: _formatTime(ev),
+                    startAt: _startAtFor(ev),
                     pastAfter: _pastAfterFor(ev, d),
                     eventYear: d.getFullYear(),
                     eventMonth: d.getMonth() + 1,
@@ -304,8 +318,8 @@ PlasmoidItem {
             if (dayEntries.length === 0) continue;
 
             var wk = _weekKey(d);
-            if (addedAnyDay && wk !== previousWeekKey) {
-                eventsModel.append({ kind: "divider", title: "", pillColor: "", timeLabel: "", isAllDay: false, pastAfter: 0, eventYear: 0, eventMonth: 0, eventDay: 0 });
+            if (showWeekDividers && addedAnyDay && wk !== previousWeekKey) {
+                eventsModel.append({ kind: "divider", title: "", pillColor: "", timeLabel: "", isAllDay: false, startAt: 0, pastAfter: 0, eventYear: 0, eventMonth: 0, eventDay: 0 });
             }
 
             eventsModel.append({
@@ -314,6 +328,7 @@ PlasmoidItem {
                 pillColor: "",
                 timeLabel: "",
                 isAllDay: false,
+                startAt: 0,
                 pastAfter: 0,
                 eventYear: 0,
                 eventMonth: 0,
@@ -614,6 +629,7 @@ PlasmoidItem {
                                            : 1.0
         readonly property real baseCardSpacing: Math.max(5, Math.round(labelSize * 0.50))
         readonly property real cardSpacing: Math.max(3, Math.round(baseCardSpacing * densityScale))
+        readonly property bool showTitle: plasmoid.configuration.showTitle
 
         Rectangle {
             id: background
@@ -638,8 +654,9 @@ PlasmoidItem {
             anchors.topMargin: Math.max(6, full.marginSize * 0.45)
             anchors.leftMargin: full.marginSize
             anchors.rightMargin: full.marginSize
-            height: Math.max(refreshIcon.height + Math.round(full.labelSize * 0.9),
-                             Math.round(full.titleSize * 2.15))
+            height: full.showTitle
+                ? Math.max(refreshIcon.height + Math.round(full.labelSize * 0.9), Math.round(full.titleSize * 2.15))
+                : refreshIcon.height + Math.round(full.labelSize * 0.75)
 
             Kirigami.Icon {
                 id: titleIcon
@@ -652,6 +669,7 @@ PlasmoidItem {
                 isMask: true
                 color: colors.foreground
                 opacity: 0.82
+                visible: full.showTitle
             }
 
             Text {
@@ -667,6 +685,7 @@ PlasmoidItem {
                 font.pixelSize: full.titleSize
                 font.weight: Font.DemiBold
                 elide: Text.ElideRight
+                visible: full.showTitle
             }
 
             PlasmaCore.ToolTipArea {
@@ -674,7 +693,8 @@ PlasmoidItem {
                 anchors.right: refreshButton.left
                 anchors.top: parent.top
                 anchors.bottom: separator.top
-                mainText: "Clicca su un evento per aprirne il giorno su KOrganizer"
+                visible: full.showTitle
+                mainText: i18nd(root.trDomain, "Click an event to open it in KOrganizer")
             }
 
             // Manual refresh: request a real Google -> Akonadi synchronization.
@@ -811,6 +831,8 @@ PlasmoidItem {
                                 item.cardTitle = model.title;
                                 item.cardTime = model.timeLabel;
                                 item.cardPill = model.pillColor;
+                                item.cardIsAllDay = model.isAllDay;
+                                item.cardStartAt = model.startAt;
                                 item.cardPastAfter = model.pastAfter;
                                 item.cardEventYear = model.eventYear;
                                 item.cardEventMonth = model.eventMonth;
@@ -858,6 +880,8 @@ PlasmoidItem {
                 property string cardTitle: ""
                 property string cardTime: ""
                 property string cardPill: ""
+                property bool cardIsAllDay: false
+                property real cardStartAt: 0
                 property real cardPastAfter: 0
                 property int cardEventYear: 0
                 property int cardEventMonth: 0
@@ -872,8 +896,13 @@ PlasmoidItem {
                 densityScale: full.densityScale
                 cardBg: colors.cardBackground
                 cardBgOpacity: colors.cardBackgroundOpacity
+                startAt: cardStartAt
                 pastAfter: cardPastAfter
                 nowTimestamp: root.currentTimeMs
+                isAllDay: cardIsAllDay
+                highlightTemporalState: plasmoid.configuration.highlightTemporalEvents
+                soonColor: Kirigami.Theme.neutralTextColor
+                inProgressColor: Kirigami.Theme.positiveTextColor
                 focusColor: Kirigami.Theme.highlightColor
                 accessibleDescription: i18nd(root.trDomain, "Click an event to open its day in KOrganizer")
                 onActivated: root.openEventDay(cardEventYear, cardEventMonth, cardEventDay)

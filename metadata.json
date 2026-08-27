@@ -15,7 +15,7 @@
     "License": "GPL-3.0",
     "Name": "Simple Plasma Agenda",
     "Name[it]": "Simple Plasma Agenda",
-    "Version": "0.2.21",
+    "Version": "0.2.22-dev1",
     "Website": "https://github.com/Omar-Ceretta/simple-plasma-agenda"
   },
   "X-Plasma-API-Minimum-Version": "6.0"

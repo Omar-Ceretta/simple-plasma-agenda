@@ -548,20 +548,14 @@ start_akonadi() {
     akonadictl start >/dev/null 2>&1 || warn "Akonadi did not start immediately; you can start it later with: akonadictl start"
 }
 
-manual_pimevents_fallback() {
+calendar_selector_unavailable() {
     cat <<'FALLBACK'
 
-The automatic calendar selector could not be started on this system.
+The automatic Akonadi calendar selector could not be started on this system.
+No calendar selection was changed.
 
-Fallback using Plasma's Digital Clock:
-  1. Open Digital Clock settings -> Calendar.
-  2. Temporarily enable PIM Events.
-  3. Select only the calendars you want Simple Plasma Agenda to display.
-  4. Apply the settings.
-  5. You may then disable PIM Events in the Digital Clock again.
-
-The selection remains stored globally for pimevents and Simple Plasma Agenda
-can continue to use it without displaying PIM events in the clock.
+Check the reported prerequisites, then retry calendar selection with:
+  install.sh --calendars
 FALLBACK
 }
 
@@ -831,9 +825,8 @@ EOF
 }
 
 configure_pimevents_calendars() {
-    local rc=0 before_selection
+    local rc=0
     PIMEVENTS_SELECTION_CHANGED=0
-    before_selection="$(pimevents_calendar_selection)"
     run_calendar_selector || rc=$?
     if [[ $rc -eq 0 ]]; then
         return 0
@@ -844,25 +837,9 @@ configure_pimevents_calendars() {
         return 2
     fi
 
-    warn "The automatic calendar selector is unavailable; using the Plasma fallback instructions."
-    manual_pimevents_fallback
-    if ! confirm "Have you configured at least one PIM Events calendar?"; then
-        return 2
-    fi
-
-    local selection
-    selection="$(pimevents_calendar_selection)"
-    if [[ -z "$selection" ]]; then
-        warn "No PIM Events calendar selection was found."
-        return 2
-    fi
-
-    if [[ "$selection" != "$before_selection" ]]; then
-        PIMEVENTS_SELECTION_CHANGED=1
-    fi
-
-    log "Existing PIM Events calendar selection: $selection"
-    return 0
+    warn "The automatic Akonadi calendar selector is unavailable."
+    calendar_selector_unavailable
+    return 2
 }
 
 reload_plasma_shell() {

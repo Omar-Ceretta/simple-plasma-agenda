@@ -23,12 +23,20 @@ ColumnLayout {
     property int cfg_styleModeDefault: 1
     property int cfg_appearance: 2
     property int cfg_appearanceDefault: 2
-    property int cfg_cornerRadius: 16
-    property int cfg_cornerRadiusDefault: 16
+    property int cfg_transparencyLevel: 1
+    property int cfg_transparencyLevelDefault: 1
+    property int cfg_cornerRadius: 12
+    property int cfg_cornerRadiusDefault: 12
     property int cfg_densityMode: 1
     property int cfg_densityModeDefault: 1
     property int cfg_eventTextSize: 1
     property int cfg_eventTextSizeDefault: 1
+    property bool cfg_showTitle: true
+    property bool cfg_showTitleDefault: true
+    property bool cfg_showWeekDividers: true
+    property bool cfg_showWeekDividersDefault: true
+    property bool cfg_highlightTemporalEvents: true
+    property bool cfg_highlightTemporalEventsDefault: true
     property var cfg_enabledCalendarPlugins: ["pimevents"]
     property var cfg_enabledCalendarPluginsDefault: ["pimevents"]
 
@@ -37,6 +45,7 @@ ColumnLayout {
     Kirigami.FormLayout {
         Layout.fillWidth: true
         Layout.topMargin: Kirigami.Units.largeSpacing
+
         ComboBox {
             id: firstDayCombo
             Kirigami.FormData.label: i18nd(root.trDomain, "First day of week:")
@@ -45,8 +54,6 @@ ColumnLayout {
                 i18nd(root.trDomain, "Monday")
             ]
         }
-
-        Item { Kirigami.FormData.isSection: true }
 
         ComboBox {
             id: lookaheadCombo
@@ -85,7 +92,7 @@ ColumnLayout {
         Layout.rightMargin: Kirigami.Units.largeSpacing
         visible: true
         type: Kirigami.MessageType.Information
-        text: i18nd(root.trDomain, "Simple Plasma Agenda displays events exposed by KDE PIM/Akonadi. This can include Google, CalDAV/Nextcloud, iCalendar and other sources configured in Akonadi.")
+        text: i18nd(root.trDomain, "Simple Plasma Agenda displays calendars exposed by KDE PIM/Akonadi. To change which calendars are shown, run the installer again with --calendars.")
     }
 
     Label {
@@ -93,34 +100,8 @@ ColumnLayout {
         Layout.leftMargin: Kirigami.Units.largeSpacing
         Layout.rightMargin: Kirigami.Units.largeSpacing
         wrapMode: Text.WordWrap
-        text: i18nd(root.trDomain, "Calendar and account selection is intentionally not changed from this widget. No additional login or Google API project is required by Simple Plasma Agenda.")
+        text: i18nd(root.trDomain, "The refresh button forces Akonadi Google resources to synchronize immediately. Other Akonadi sources keep using their own synchronization mechanisms.")
     }
-
-    Label {
-        Layout.fillWidth: true
-        Layout.leftMargin: Kirigami.Units.largeSpacing
-        Layout.rightMargin: Kirigami.Units.largeSpacing
-        wrapMode: Text.WordWrap
-        text: i18nd(root.trDomain, "The desktop refresh button currently forces Akonadi Google resources to synchronize immediately. Automatic synchronization can do the same every 5 minutes; other Akonadi sources remain visible but use their own synchronization mechanisms.")
-    }
-
-    Kirigami.InlineMessage {
-        Layout.fillWidth: true
-        Layout.leftMargin: Kirigami.Units.largeSpacing
-        Layout.rightMargin: Kirigami.Units.largeSpacing
-        visible: true
-        type: Kirigami.MessageType.Warning
-        text: i18nd(root.trDomain, "Changing the enabled PIM calendars from some Plasma 6 widgets can crash plasmashell. For this reason this widget does not provide calendar-selection checkboxes.")
-    }
-
-    Label {
-        Layout.fillWidth: true
-        Layout.leftMargin: Kirigami.Units.largeSpacing
-        Layout.rightMargin: Kirigami.Units.largeSpacing
-        wrapMode: Text.WordWrap
-        text: i18nd(root.trDomain, "Akonadi data are shared with Plasma's Digital Clock, so a synchronization requested here updates its agenda too.")
-    }
-
 
     Item { Layout.fillHeight: true }
 }

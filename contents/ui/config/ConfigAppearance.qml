@@ -14,12 +14,20 @@ ColumnLayout {
     property int cfg_styleModeDefault: 1
     property alias cfg_appearance: appearanceCombo.currentIndex
     property int cfg_appearanceDefault: 2
+    property alias cfg_transparencyLevel: transparencyCombo.currentIndex
+    property int cfg_transparencyLevelDefault: 1
     property alias cfg_cornerRadius: radiusSpin.value
-    property int cfg_cornerRadiusDefault: 16
+    property int cfg_cornerRadiusDefault: 12
     property alias cfg_densityMode: densityCombo.currentIndex
     property int cfg_densityModeDefault: 1
     property alias cfg_eventTextSize: eventTextSizeCombo.currentIndex
     property int cfg_eventTextSizeDefault: 1
+    property alias cfg_showTitle: showTitleCheck.checked
+    property bool cfg_showTitleDefault: true
+    property alias cfg_showWeekDividers: showWeekDividersCheck.checked
+    property bool cfg_showWeekDividersDefault: true
+    property alias cfg_highlightTemporalEvents: highlightTemporalEventsCheck.checked
+    property bool cfg_highlightTemporalEventsDefault: true
     property int cfg_firstDayOfWeek: 1
     property int cfg_firstDayOfWeekDefault: 1
     property int cfg_lookaheadDays: 7
@@ -33,17 +41,30 @@ ColumnLayout {
         Layout.fillWidth: true
         visible: true
         type: Kirigami.MessageType.Information
-        text: i18nd(root.trDomain, "Solid follows the Plasma color scheme and is the recommended default. Translucent keeps the same colors with a slightly transparent background.")
+        text: i18nd(root.trDomain, "Solid uses the selected color scheme. Translucent lets the desktop show through and offers three transparency levels.")
     }
 
     Kirigami.FormLayout {
         Layout.fillWidth: true
+
         ComboBox {
             id: styleCombo
             Kirigami.FormData.label: i18nd(root.trDomain, "Background:")
             model: [
                 i18nd(root.trDomain, "Translucent"),
                 i18nd(root.trDomain, "Solid")
+            ]
+        }
+
+        ComboBox {
+            id: transparencyCombo
+            visible: styleCombo.currentIndex === 0
+            enabled: visible
+            Kirigami.FormData.label: i18nd(root.trDomain, "Transparency:")
+            model: [
+                i18nd(root.trDomain, "Low"),
+                i18nd(root.trDomain, "Medium"),
+                i18nd(root.trDomain, "High")
             ]
         }
 
@@ -71,8 +92,6 @@ ColumnLayout {
             ]
         }
 
-        Item { Kirigami.FormData.isSection: true }
-
         ComboBox {
             id: eventTextSizeCombo
             Kirigami.FormData.label: i18nd(root.trDomain, "Event text size:")
@@ -83,8 +102,6 @@ ColumnLayout {
             ]
         }
 
-        Item { Kirigami.FormData.isSection: true }
-
         SpinBox {
             id: radiusSpin
             Kirigami.FormData.label: i18nd(root.trDomain, "Corner radius (px):")
@@ -92,6 +109,26 @@ ColumnLayout {
             to: 40
             stepSize: 1
         }
+    }
+
+    Kirigami.Separator { Layout.fillWidth: true }
+
+    CheckBox {
+        id: showTitleCheck
+        Layout.fillWidth: true
+        text: i18nd(root.trDomain, "Show title")
+    }
+
+    CheckBox {
+        id: showWeekDividersCheck
+        Layout.fillWidth: true
+        text: i18nd(root.trDomain, "Show weekly dividers")
+    }
+
+    CheckBox {
+        id: highlightTemporalEventsCheck
+        Layout.fillWidth: true
+        text: i18nd(root.trDomain, "Highlight events starting within 15 minutes or in progress")
     }
 
     Item { Layout.fillHeight: true }

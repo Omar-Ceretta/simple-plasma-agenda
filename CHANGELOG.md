@@ -2,6 +2,17 @@
 
 ## Italiano
 
+### 0.2.22-dev1 — in sviluppo
+
+- Nuovo default del raggio degli angoli: **12 px**.
+- Titolo del widget opzionale; quando è nascosto resta la sola azione di refresh nella testata compatta.
+- Sfondo traslucido con tre livelli: **Bassa / Media / Alta** trasparenza.
+- Evidenziazione opzionale degli eventi che iniziano entro 15 minuti (colore neutro KDE) e di quelli in corso (colore positivo KDE), senza animazioni.
+- Separatori settimanali ora opzionali.
+- Tooltip del titolo traducibile e abbreviato a **«Clicca su un evento per aprirlo in KOrganizer»**.
+- Rimossi i riferimenti al vecchio percorso di configurazione esterno dal widget e dal fallback dell'installer.
+- Backend Akonadi/pimevents, sincronizzazione e apertura di KOrganizer invariati.
+
 ### 0.2.21 — widget 2026-08-26; installer/documentazione aggiornati fino al 2026-08-27
 
 - Dimensione iniziale ridotta a **19 × 21** unità Kirigami, con coefficienti responsive ricalibrati.
@@ -38,6 +49,17 @@
 ---
 
 ## English
+
+### 0.2.22-dev1 — in development
+
+- New default corner radius: **12 px**.
+- Optional widget title; when hidden, only the refresh action remains in the compact header.
+- Translucent background now offers **Low / Medium / High** transparency.
+- Optional semantic highlighting for events starting within 15 minutes (KDE neutral color) and events in progress (KDE positive color), with no animation.
+- Week separators are now optional.
+- The title tooltip is translatable and shortened to **“Click an event to open it in KOrganizer”**.
+- Removed references to the old external configuration path from the widget and the installer fallback.
+- Akonadi/pimevents backend, synchronization and KOrganizer opening logic are unchanged.
 
 ### 0.2.21 — widget 2026-08-26; installer/docs updated through 2026-08-27
 

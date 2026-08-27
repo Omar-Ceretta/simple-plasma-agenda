@@ -6,8 +6,10 @@ QtObject {
 
     // styleMode: 0 = translucent, 1 = solid
     // appearance: 0 = dark, 1 = light, 2 = follow Plasma
+    // transparencyLevel: 0 = low, 1 = medium, 2 = high
     property int styleMode: 1
     property int appearance: 2
+    property int transparencyLevel: 1
 
     readonly property bool useSystem: appearance === 2
     readonly property bool systemIsDark: {
@@ -28,6 +30,16 @@ QtObject {
 
     readonly property color separator: foreground
     readonly property color cardBackground: foreground
-    readonly property real cardBackgroundOpacity: isTranslucent ? 0.075 : 0.055
-    readonly property real backgroundOpacity: isTranslucent ? 0.86 : 1.0
+
+    // Higher background transparency gets a little more event-card contrast so
+    // text remains easy to scan over busy wallpapers.
+    readonly property real cardBackgroundOpacity: !isTranslucent ? 0.055
+        : transparencyLevel === 0 ? 0.065
+        : transparencyLevel === 2 ? 0.110
+        : 0.085
+
+    readonly property real backgroundOpacity: !isTranslucent ? 1.0
+        : transparencyLevel === 0 ? 0.94
+        : transparencyLevel === 2 ? 0.76
+        : 0.86
 }
