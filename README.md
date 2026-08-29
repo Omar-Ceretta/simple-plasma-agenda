@@ -96,7 +96,7 @@ Comandi utili:
 
 ### Installazione diretta del plasmoide
 
-Se KDE PIM/Akonadi e `pimevents` sono già configurati, puoi scaricare l'asset stabile dalla [release più recente]([https://github.com/Omar-Ceretta/simple-plasma-agenda/releases/latest/]) e installarlo con:
+Se KDE PIM/Akonadi e `pimevents` sono già configurati, puoi scaricare l'asset stabile dalla [release più recente](https://github.com/Omar-Ceretta/simple-plasma-agenda/releases/latest/) e installarlo con:
 
 ```bash
 kpackagetool6 -t Plasma/Applet -i Simple-Plasma-Agenda.plasmoid
